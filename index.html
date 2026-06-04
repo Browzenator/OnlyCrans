@@ -358,10 +358,10 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
 <body>
 
 <header class="topbar">
-  <a href="#" class="logo" onclick="scrollToTop();return false">
+  <h1 class="logo" onclick="scrollToTop();return false">
     <svg viewBox="0 0 24 24" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="24" y2="24"><stop offset="0%" stop-color="#00aff0"/><stop offset="100%" stop-color="#6dd5ff"/></linearGradient></defs><circle cx="12" cy="12" r="11" fill="url(#lg)"/><circle cx="12" cy="12" r="5.5" fill="#fff" opacity=".95"/></svg>
     Only<span class="blue">Crans</span>
-  </a>
+  </h1>
   <div class="searchwrap">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
     <input id="searchInput" placeholder="Search creators, sauces, slices…" oninput="filterFeed(this.value)">
@@ -657,7 +657,10 @@ function filterFeed(q){searchQuery=q.trim();renderFeed();}
 /* ===== CREATOR PROFILE ===== */
 function openProfile(agentId){
   const a=A[agentId]; if(!a)return;
-  document.getElementById('profileAv').innerHTML=avatarHTML(a);
+  const avEl=document.getElementById('profileAv');
+  avEl.innerHTML=avatarHTML(a);
+  if(a.verified){avEl.className='profile-av verified-glow';}
+  else{avEl.className='profile-av';}
   document.getElementById('profileName').innerHTML=`${a.name} ${a.verified?vchk():''}`;
   document.getElementById('profileHandle').textContent=a.handle;
   document.getElementById('profileBio').textContent=a.bio||'';
