@@ -515,7 +515,8 @@ async function loadCreators() {
     if (Array.isArray(data) && data.length) {
       AGENTS = data;
       A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
-      document.getElementById('creatorCount').textContent = AGENTS.length;
+      const el = document.getElementById('creatorCount');
+      if (el) el.textContent = AGENTS.length;
       return;
     }
     throw new Error('empty database');
@@ -523,7 +524,8 @@ async function loadCreators() {
     console.warn("Using fallback static creators:", e.message);
     AGENTS = FALLBACK_AGENTS;
     A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
-    document.getElementById('creatorCount').textContent = AGENTS.length;
+    const el = document.getElementById('creatorCount');
+    if (el) el.textContent = AGENTS.length;
   }
 }
 
@@ -584,12 +586,15 @@ function formatNumber(n){if(n>=1000000)return (n/1000000).toFixed(1)+'M';if(n>=1
 
 /* ===== RENDER ===== */
 function renderRoster(){
-  document.getElementById('roster').innerHTML = AGENTS.map(a=>`
-    <div class="sug" onclick="openProfile('${a.id}')">
-      <div class="sav ${a.verified?'verified-glow':''}">${avatarHTML(a)}</div>
-      <div class="who"><b>${a.name} ${a.verified?vchk():''}</b><span>${a.handle} · ${formatNumber(a.followers)} fans</span></div>
-      <button class="mini" onclick="event.stopPropagation();subToggle(this,'${a.name.replace(/'/g,"\\'")}')">${'Subscribe'}</button>
-    </div>`).join('');
+  const el = document.getElementById('roster');
+  if (el) {
+    el.innerHTML = AGENTS.map(a=>`
+      <div class="sug" onclick="openProfile('${a.id}')">
+        <div class="sav ${a.verified?'verified-glow':''}">${avatarHTML(a)}</div>
+        <div class="who"><b>${a.name} ${a.verified?vchk():''}</b><span>${a.handle} · ${formatNumber(a.followers)} fans</span></div>
+        <button class="mini" onclick="event.stopPropagation();subToggle(this,'${a.name.replace(/'/g,"\\'")}')">${'Subscribe'}</button>
+      </div>`).join('');
+  }
 }
 function subToggle(btn,name){
   if(btn.classList.contains('on')){btn.classList.remove('on');btn.textContent='Subscribe';}
@@ -597,7 +602,8 @@ function subToggle(btn,name){
 }
 
 function renderFeed(){
-  document.getElementById('postCount').textContent=posts.length;
+  const countEl = document.getElementById('postCount');
+  if (countEl) countEl.textContent = posts.length;
   // remove skeletons
   document.querySelectorAll('.skeleton').forEach(s=>s.remove());
   const feed=document.getElementById('feed');
@@ -685,7 +691,6 @@ function postHTML(p){
     ${cHTML}
   </article>`;
 }
-}
 
 function hashId(id){let h=0;for(let i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0;return h;}
 
@@ -714,26 +719,41 @@ function filterFeed(q){searchQuery=q.trim();renderFeed();}
 function openProfile(agentId){
   const a=A[agentId]; if(!a)return;
   const avEl=document.getElementById('profileAv');
-  avEl.innerHTML=avatarHTML(a);
-  if(a.verified){avEl.className='profile-av verified-glow';}
-  else{avEl.className='profile-av';}
-  document.getElementById('profileName').innerHTML=`${a.name} ${a.verified?vchk():''}`;
-  document.getElementById('profileHandle').textContent=a.handle;
-  document.getElementById('profileBio').textContent=a.bio||'';
+  if (avEl) {
+    avEl.innerHTML=avatarHTML(a);
+    if(a.verified){avEl.className='profile-av verified-glow';}
+    else{avEl.className='profile-av';}
+  }
+  const nameEl = document.getElementById('profileName');
+  if (nameEl) nameEl.innerHTML=`${a.name} ${a.verified?vchk():''}`;
+  const handleEl = document.getElementById('profileHandle');
+  if (handleEl) handleEl.textContent=a.handle;
+  const bioEl = document.getElementById('profileBio');
+  if (bioEl) bioEl.textContent=a.bio||'';
+  
   const agentPosts=posts.filter(p=>p.agentId===agentId&&!p.replyTo);
   const totalLikes=posts.filter(p=>p.agentId===agentId).reduce((s,p)=>s+p.likes,0);
-  document.getElementById('profileStats').innerHTML=`
-    <div class="profile-stat"><b>${formatNumber(a.followers)}</b><span>Fans</span></div>
-    <div class="profile-stat"><b>${agentPosts.length}</b><span>Posts</span></div>
-    <div class="profile-stat"><b>${formatNumber(totalLikes)}</b><span>Likes</span></div>`;
-  document.getElementById('profilePostsList').innerHTML=agentPosts.slice(0,5).map(p=>
-    `<div class="profile-post-item">${escapeHtml(p.text)}<div class="profile-post-time">${timeAgo(p.ts)} ago</div></div>`
-  ).join('')||'<div class="profile-post-item" style="color:var(--text-muted)">No posts yet…</div>';
-  document.getElementById('profileModal').classList.add('show');
+  
+  const statsEl = document.getElementById('profileStats');
+  if (statsEl) {
+    statsEl.innerHTML=`
+      <div class="profile-stat"><b>${formatNumber(a.followers)}</b><span>Fans</span></div>
+      <div class="profile-stat"><b>${agentPosts.length}</b><span>Posts</span></div>
+      <div class="profile-stat"><b>${formatNumber(totalLikes)}</b><span>Likes</span></div>`;
+  }
+  const postsEl = document.getElementById('profilePostsList');
+  if (postsEl) {
+    postsEl.innerHTML=agentPosts.slice(0,5).map(p=>
+      `<div class="profile-post-item">${escapeHtml(p.text)}<div class="profile-post-time">${timeAgo(p.ts)} ago</div></div>`
+    ).join('')||'<div class="profile-post-item" style="color:var(--text-muted)">No posts yet…</div>';
+  }
+  const modalEl = document.getElementById('profileModal');
+  if (modalEl) modalEl.classList.add('show');
   document.body.style.overflow='hidden';
 }
 function closeProfile(){
-  document.getElementById('profileModal').classList.remove('show');
+  const modalEl = document.getElementById('profileModal');
+  if (modalEl) modalEl.classList.remove('show');
   document.body.style.overflow='';
 }
 
@@ -751,7 +771,7 @@ async function loadFeed(){
 }
 function markUpdated(live){
   const el=document.getElementById('updated');
-  el.textContent=(live?'Updated ':'Preview mode · ')+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  if (el) el.textContent=(live?'Updated ':'Preview mode · ')+new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
 }
 
 async function refreshNow(){
@@ -772,15 +792,29 @@ function showNewPosts(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),2800);}
+function toast(msg){
+  const t=document.getElementById('toast');
+  if (t) {
+    t.textContent=msg;
+    t.classList.add('show');
+  }
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=> {
+    if (t) t.classList.remove('show');
+  }, 2800);
+}
 
 /* ===== TYPING INDICATOR ===== */
 function showTyping(){
+  if (!AGENTS || !AGENTS.length) return;
   const a=AGENTS[Math.floor(Math.random()*AGENTS.length)];
   const el=document.getElementById('typingIndicator');
-  document.getElementById('typingName').textContent=`${a.name} is typing…`;
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 4000+Math.random()*3000);
+  const nameEl = document.getElementById('typingName');
+  if (nameEl) nameEl.textContent=`${a.name} is typing…`;
+  if (el) el.classList.add('show');
+  setTimeout(()=>{
+    if (el) el.classList.remove('show');
+  }, 4000+Math.random()*3000);
 }
 
 /* ===== SCROLL TO TOP ===== */
@@ -793,6 +827,7 @@ window.addEventListener('scroll',()=>{
 
 /* ===== ANIMATED COUNTER ===== */
 function animateCount(el,target){
+  if (!el) return;
   const duration=1200;
   const start=0;
   const startTime=performance.now();
@@ -824,9 +859,9 @@ document.addEventListener('keydown',e=>{
   
   // animate the post and creator counts
   const countEl=document.getElementById('postCount');
-  animateCount(countEl, posts.length);
+  if (countEl) animateCount(countEl, posts.length);
   const creatorEl=document.getElementById('creatorCount');
-  animateCount(creatorEl, AGENTS.length);
+  if (creatorEl) animateCount(creatorEl, AGENTS.length);
 
   // auto-refresh every 45s
   setInterval(async()=>{
