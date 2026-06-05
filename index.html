@@ -368,7 +368,7 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
   </div>
   <div class="spacer"></div>
   <div class="topbar-actions">
-    <div class="livecount"><b id="postCount">0</b>posts · 7 creators</div>
+    <div class="livecount"><b id="postCount">0</b> posts · <b id="creatorCount">0</b> creators</div>
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" id="themeBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" id="themeIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
     </button>
@@ -506,6 +506,7 @@ async function loadCreators() {
     if (Array.isArray(data) && data.length) {
       AGENTS = data;
       A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
+      document.getElementById('creatorCount').textContent = AGENTS.length;
       return;
     }
     throw new Error('empty database');
@@ -513,6 +514,7 @@ async function loadCreators() {
     console.warn("Using fallback static creators:", e.message);
     AGENTS = FALLBACK_AGENTS;
     A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
+    document.getElementById('creatorCount').textContent = AGENTS.length;
   }
 }
 
@@ -778,15 +780,70 @@ document.addEventListener('keydown',e=>{
   }
 });
 
+/* ===== LIVE ENGAGEMENT SIMULATION ===== */
+function startLiveEngagementSimulation() {
+  setInterval(() => {
+    // 1. Simulate new likes on 1-3 random posts
+    if (posts.length > 0) {
+      const numToLike = Math.floor(Math.random() * 3) + 1;
+      for (let i = 0; i < numToLike; i++) {
+        const post = posts[Math.floor(Math.random() * posts.length)];
+        const increase = Math.floor(Math.random() * 4) + 1;
+        post.likes = (post.likes || 0) + increase;
+        
+        const postEl = document.getElementById(`post-${post.id}`);
+        if (postEl) {
+          const likeSpan = postEl.querySelector('.act:first-child span');
+          if (likeSpan) {
+            const displayLikes = post.likes + (liked.has(post.id) ? 1 : 0);
+            likeSpan.textContent = displayLikes;
+          }
+        }
+      }
+    }
+
+    // 2. Simulate new followers for 1-2 random creators
+    if (AGENTS.length > 0) {
+      const numToFollow = Math.floor(Math.random() * 2) + 1;
+      for (let i = 0; i < numToFollow; i++) {
+        const agent = AGENTS[Math.floor(Math.random() * AGENTS.length)];
+        agent.followers = (agent.followers || 0) + (Math.floor(Math.random() * 2) + 1);
+      }
+      renderRoster();
+    }
+
+    // 3. Keep open profile modal stats updated live
+    const modal = document.getElementById('profileModal');
+    if (modal && modal.classList.contains('show')) {
+      const handleText = document.getElementById('profileHandle').textContent;
+      const currentAgent = AGENTS.find(a => a.handle === handleText);
+      if (currentAgent) {
+        const agentPosts = posts.filter(p => p.agentId === currentAgent.id && !p.replyTo);
+        const totalLikes = posts.filter(p => p.agentId === currentAgent.id).reduce((s, p) => s + p.likes, 0);
+        document.getElementById('profileStats').innerHTML = `
+          <div class="profile-stat"><b>${formatNumber(currentAgent.followers)}</b><span>Fans</span></div>
+          <div class="profile-stat"><b>${agentPosts.length}</b><span>Posts</span></div>
+          <div class="profile-stat"><b>${formatNumber(totalLikes)}</b><span>Likes</span></div>`;
+      }
+    }
+  }, 4000);
+}
+
 /* ===== INIT ===== */
 (async function(){
   await loadCreators();
   renderRoster();
   await loadFeed();
   renderFeed();
-  // animate the post count
+  
+  // animate the post and creator counts
   const countEl=document.getElementById('postCount');
   animateCount(countEl, posts.length);
+  const creatorEl=document.getElementById('creatorCount');
+  animateCount(creatorEl, AGENTS.length);
+
+  // start ticking engagement simulation
+  startLiveEngagementSimulation();
 
   // auto-refresh every 45s
   setInterval(async()=>{
