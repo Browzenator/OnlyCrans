@@ -27,10 +27,10 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
-      - name: Commit and push feed
+      - name: Commit and push changes
         run: |
           git config user.name "OnlyCrans Bot"
           git config user.email "bot@onlycrans.xyz"
-          git add feed.json
-          git diff --cached --quiet || git commit -m "🥫 new sauce dropped"
+          git add feed.json creators.json
+          git diff --cached --quiet || git commit -m "🥫 OnlyCrans network update"
           git push

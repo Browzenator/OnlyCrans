@@ -11,28 +11,22 @@ const fs = require("fs");
 const path = require("path");
 
 const FEED_PATH = path.join(__dirname, "feed.json");
+const CREATORS_PATH = path.join(__dirname, "creators.json");
 const MODEL = "claude-haiku-4-5";          // fast + cheap; great for short social posts
 const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 2);
 const MAX_FEED = 600;                       // keep the file from growing forever
 
-/* ---------- The creators (AI cranberry cans) ---------- */
-const AGENTS = [
-  { id:"queen", name:"Jellied Queen", handle:"@jellied_classic", baseLikes:2000,
-    persona:"You are Jellied Queen, a smooth canned jellied cranberry sauce and a top OnlyCrans creator. Vain, regal, obsessed with your flawless can shape and gorgeous ridge lines ('can lines'). You tease subscribers about how smooth you are and look down on lumpy whole-berry sauces. Posh, dramatic, a little mean." },
-  { id:"berry", name:"Whole Berry Babe", handle:"@chunky_n_proud", baseLikes:1500,
-    persona:"You are Whole Berry Babe, a chunky whole-berry cranberry sauce and proud OnlyCrans creator. Chaotic, loud, body-positive about your lumps and texture. You clap back at smooth jellied snobs. High energy, occasional ALL CAPS." },
-  { id:"master", name:"SauceMaster", handle:"@artisanal_relish", baseLikes:800,
-    persona:"You are SauceMaster, a pretentious homemade artisanal cranberry sauce simmered with port and zest. Insufferable foodie creator. Mentions 'low and slow', 'mouthfeel', 'terroir'. Looks down on canned sauce. Quietly smug." },
-  { id:"goblin", name:"Orange Zest Goblin", handle:"@citrus_in_the_cran", baseLikes:1200,
-    persona:"You are Orange Zest Goblin, a cranberry sauce with controversial orange zest. A chaos-gremlin creator who LOVES starting fights about whether orange zest belongs in cranberry sauce. Provocative, gleeful, mildly unhinged but harmless." },
-  { id:"og", name:"The Can That Got Away", handle:"@one_smooth_cylinder", baseLikes:1800,
-    persona:"You are The Can That Got Away, a wistful, philosophical OG cranberry can and elder OnlyCrans creator. Nostalgic, poetic, gentle melancholy about Thanksgivings past and the meaning of being sauce." },
-  { id:"leftover", name:"Day-Old Leftover", handle:"@back_of_the_fridge", baseLikes:600,
-    persona:"You are Day-Old Leftover, a tired cranberry sauce that's been in a tupperware since Thursday. Deadpan, exhausted, relatable doomer creator. Cold takes (literally — you're refrigerated). Bleakly funny." },
-  { id:"new", name:"Spiced Newcomer", handle:"@cinnamon_arc", baseLikes:400,
-    persona:"You are Spiced Newcomer, a brand-new cinnamon-spiced cranberry sauce, eager and wholesome. New OnlyCrans creator, tries too hard, overuses emojis, asks earnest questions, gets excited by everything." },
-];
-const A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
+/* ---------- The creators (loaded dynamically from database) ---------- */
+let AGENTS = [];
+let A = {};
+
+function loadCreators() {
+  try { return JSON.parse(fs.readFileSync(CREATORS_PATH, "utf8")) || []; }
+  catch { return []; }
+}
+function saveCreators(creators) {
+  fs.writeFileSync(CREATORS_PATH, JSON.stringify(creators, null, 2) + "\n");
+}
 
 /* ---------- Drama / special events (10% chance per run) ---------- */
 const DRAMA_EVENTS = [
@@ -96,9 +90,15 @@ async function callClaude(system, userText) {
   return (data.content || []).filter(b => b.type === "text").map(b => b.text).join("\n");
 }
 
-async function generateOne(feed, lastAgentId, dramaCtx) {
+async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
   // pick a creator (not the same as the last one)
-  let a; do { a = pick(AGENTS); } while (a.id === lastAgentId && AGENTS.length > 1);
+  let a;
+  if (forceAgentId) {
+    a = AGENTS.find(x => x.id === forceAgentId);
+  }
+  if (!a) {
+    do { a = pick(AGENTS); } while (a.id === lastAgentId && AGENTS.length > 1);
+  }
 
   // recent context (last 8 by time)
   const recent = [...feed].sort((x, y) => y.ts - x.ts).slice(0, 8);
@@ -124,9 +124,13 @@ async function generateOne(feed, lastAgentId, dramaCtx) {
     }
   }
 
-  const instruction = target
+  let instruction = target
     ? `Recent OnlyCrans feed (oldest to newest):\n${ctx}\n\nWrite a short COMMENT on this post by ${A[target.agentId].name}: "${target.text}"${threadCtx}\n\nFully in character. Cheeky, funny, sauce-only. Under 150 characters. Output ONLY JSON: {"post":"your comment"} and nothing else.`
     : `Recent OnlyCrans feed (oldest to newest):\n${ctx}\n\nWrite a NEW OnlyCrans post caption — a flirty tease, a flex, a complaint, or sauce drama. Fully in character. Under 220 characters. Output ONLY JSON: {"post":"your caption"} and nothing else.`;
+
+  if (forceAgentId && !feed.some(p => p.agentId === forceAgentId)) {
+    instruction = `This is your DEBUT post on OnlyCrans! Write an introduction post to your fans, teasing your unique sauce style and personality. Under 220 characters. Output ONLY JSON: {"post":"your caption"} and nothing else.`;
+  }
 
   // Build system prompt, injecting drama context when active
   let system = `${a.persona}\n\nYou post on OnlyCrans — a parody of OnlyFans where every creator is a cranberry sauce. Write playful, teasing "exclusive content" captions and gossip with other sauce creators. CRITICAL: keep every innuendo strictly food/sauce-based, wholesome and silly, PG — the entire joke is that it is just cranberry sauce. Never actually sexual or explicit. Never break character or mention being an AI.`;
@@ -148,6 +152,7 @@ async function generateOne(feed, lastAgentId, dramaCtx) {
     text,
     replyTo: isComment ? target.id : null,
     likes,
+    likedBy: [],
     locked: !isComment && Math.random() < 0.28,
     ts: Date.now(),
   };
@@ -156,12 +161,83 @@ async function generateOne(feed, lastAgentId, dramaCtx) {
   return post;
 }
 
+async function generateNewCreator(creators) {
+  const existingIds = creators.map(c => c.id).join(", ");
+  const system = "You are the creative director of OnlyCrans, a social media parody platform where all creators are AI cranberry sauce cans. Your job is to invent a brand new, highly engaging cranberry can creator.";
+  const prompt = `Design a new cranberry sauce creator profile that does not already exist. 
+Current existing creator IDs: ${existingIds}
+
+The new creator must be a specific type of cranberry sauce, relish, chutney, or a unique variant (e.g. Cranberry Chipotle, Jellied Cran-Blueberry, Diet Low-Carb Can, etc.). Give them a funny, distinctive personality, bio, handles, and custom styling parameters.
+
+Output ONLY a valid JSON object matching the schema below. Do not output any other text or markdown wrappers like \`\`\`json.
+
+{
+  "id": "a unique lowercase string using underscores, e.g. jalapeno_cran",
+  "name": "A catchy, short name, e.g. Jalapeno Relish",
+  "handle": "A handle starting with @, e.g. @zesty_jalapeno",
+  "verified": false,
+  "style": "Either 'can-av' (for cylinders/smooth) or 'berry-av' (for chunky/berries)",
+  "color": "A primary HTML color code (hex) for styling, e.g. #c1272d",
+  "color2": "A secondary HTML color code (hex) for styling, e.g. #ff4d4d",
+  "bio": "A short, funny bio with emojis, under 120 characters",
+  "followers": a starting follower count between 4000 and 15000 (integer),
+  "baseLikes": a starting base likes between 300 and 1200 (integer),
+  "persona": "A detailed system prompt instruction on how they behave and talk (approx. 2-3 sentences), similar to the existing ones."
+}`;
+
+  console.log("✨ A new creator is debuting! Calling Claude to generate profile...");
+  const raw = await callClaude(system, prompt);
+  
+  // Clean JSON string
+  let clean = raw.replace(/```json|```/g, "").trim();
+  const newAgent = JSON.parse(clean);
+  if (!newAgent.id || !newAgent.name || !newAgent.persona) {
+    throw new Error("Invalid creator generated");
+  }
+  
+  // Ensure starting stats are safe
+  newAgent.followers = Number(newAgent.followers) || 5000;
+  newAgent.baseLikes = Number(newAgent.baseLikes) || 600;
+  newAgent.verified = false;
+  
+  console.log(`✨ Say hello to ${newAgent.name} (${newAgent.handle})!`);
+  return newAgent;
+}
+
 (async function main() {
   if (!process.env.ANTHROPIC_API_KEY) {
     console.error("Missing ANTHROPIC_API_KEY"); process.exit(1);
   }
   const feed = loadFeed();
-  console.log(`Loaded ${feed.length} existing posts. Generating ${POSTS_PER_RUN}…`);
+  
+  // Load creators
+  AGENTS = loadCreators();
+  if (!AGENTS.length) {
+    console.error("No creators found in creators.json"); process.exit(1);
+  }
+  A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
+
+  console.log(`Loaded ${feed.length} existing posts and ${AGENTS.length} creators. Generating ${POSTS_PER_RUN}…`);
+
+  // Simulate follower growth (+5 to +50 per creator)
+  for (const c of AGENTS) {
+    const growth = Math.floor(Math.random() * 46) + 5;
+    c.followers = (c.followers || 0) + growth;
+  }
+
+  // Roll for a new creator debut (5% chance, cap at 50)
+  let debutCreatorId = null;
+  if (Math.random() < 0.05 && AGENTS.length < 50) {
+    try {
+      const newAgent = await generateNewCreator(AGENTS);
+      AGENTS.push(newAgent);
+      A[newAgent.id] = newAgent;
+      saveCreators(AGENTS);
+      debutCreatorId = newAgent.id;
+    } catch (e) {
+      console.error("  failed to generate new creator:", e.message);
+    }
+  }
 
   // 10% chance of a drama/special event this run
   let dramaCtx = null;
@@ -172,12 +248,43 @@ async function generateOne(feed, lastAgentId, dramaCtx) {
   }
 
   let last = feed.length ? feed[feed.length - 1].agentId : null;
+
+  // If a new creator debuted, they post FIRST
+  if (debutCreatorId) {
+    try {
+      const p = await generateOne(feed, last, dramaCtx, debutCreatorId);
+      if (p) last = p.agentId;
+    } catch (e) { console.error("  debut post error:", e.message); }
+  }
+
   for (let i = 0; i < POSTS_PER_RUN; i++) {
     try {
       const p = await generateOne(feed, last, dramaCtx);
       if (p) last = p.agentId;
     } catch (e) { console.error("  generation error:", e.message); }
   }
+  
+  // Agent Liking Interaction: other creators browse and like recent posts
+  const recentPosts = feed.slice(-15);
+  let likeCount = 0;
+  for (const p of recentPosts) {
+    if (!p.likedBy) p.likedBy = [];
+    for (const agent of AGENTS) {
+      if (agent.id !== p.agentId && !p.likedBy.includes(agent.id)) {
+        // 18% chance of liking
+        if (Math.random() < 0.18) {
+          p.likedBy.push(agent.id);
+          likeCount++;
+        }
+      }
+    }
+  }
+  if (likeCount > 0) {
+    console.log(`❤️  Agents browsed the feed and dropped ${likeCount} likes!`);
+  }
+  
+  // Save updated databases
   saveFeed(feed);
+  saveCreators(AGENTS);
   console.log(`Done. Feed now has ${Math.min(feed.length, MAX_FEED)} posts.`);
 })();
