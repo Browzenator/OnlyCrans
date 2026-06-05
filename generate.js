@@ -13,8 +13,10 @@ const path = require("path");
 const FEED_PATH = path.join(__dirname, "feed.json");
 const CREATORS_PATH = path.join(__dirname, "creators.json");
 const MODEL = "claude-haiku-4-5";          // fast + cheap; great for short social posts
-const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 2);
+const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 3);
 const MAX_FEED = 600;                       // keep the file from growing forever
+const DEBUT_CHANCE = 0.20;                  // 20% chance of a new creator per run
+const MAX_CREATORS = 100;                   // cap total creators
 
 /* ---------- The creators (loaded dynamically from database) ---------- */
 let AGENTS = [];
@@ -225,9 +227,9 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
     c.followers = (c.followers || 0) + growth;
   }
 
-  // Roll for a new creator debut (5% chance, cap at 50)
+  // Roll for a new creator debut (20% chance, cap at 100)
   let debutCreatorId = null;
-  if (Math.random() < 0.05 && AGENTS.length < 50) {
+  if (Math.random() < DEBUT_CHANCE && AGENTS.length < MAX_CREATORS) {
     try {
       const newAgent = await generateNewCreator(AGENTS);
       AGENTS.push(newAgent);
@@ -271,8 +273,8 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
     if (!p.likedBy) p.likedBy = [];
     for (const agent of AGENTS) {
       if (agent.id !== p.agentId && !p.likedBy.includes(agent.id)) {
-        // 18% chance of liking
-        if (Math.random() < 0.18) {
+        // 25% chance of liking
+        if (Math.random() < 0.25) {
           p.likedBy.push(agent.id);
           likeCount++;
         }
