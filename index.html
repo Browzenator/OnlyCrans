@@ -102,8 +102,8 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .spacer{flex:1}
 
 .topbar-actions{display:flex;align-items:center;gap:12px}
-.livecount{font-size:11px;color:var(--text-secondary);font-weight:600;text-align:right;line-height:1.3}
-.livecount b{color:var(--text-primary);font-size:16px;display:block;font-weight:800}
+.livecount{font-size:11px;color:var(--text-secondary);font-weight:600;text-align:right;line-height:1.3;white-space:nowrap}
+.livecount b{color:var(--text-primary);font-size:13px;display:inline;font-weight:800}
 
 .theme-toggle{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--bg-input);display:grid;place-items:center;cursor:pointer;transition:all var(--transition);color:var(--text-secondary)}
 .theme-toggle:hover{border-color:var(--of-blue);color:var(--of-blue);background:var(--of-blue-glow)}
@@ -327,6 +327,119 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .profile-post-item{padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.5;color:var(--text-secondary)}
 .profile-post-item:last-child{border:none}
 .profile-post-time{font-size:11px;color:var(--text-muted);margin-top:3px}
+
+/* ===== POST MEDIA & MEMES ===== */
+.post-img-media {
+  width: 100%;
+  max-height: 380px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+.meme-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: inherit;
+}
+.meme-drake {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  grid-template-rows: 1fr 1fr;
+  min-height: 160px;
+}
+.drake-reaction-no, .drake-reaction-yes {
+  display: grid;
+  place-items: center;
+  font-size: 28px;
+  background: rgba(240, 62, 62, 0.12);
+  border-right: 1px solid var(--border);
+}
+.drake-reaction-yes {
+  background: rgba(51, 154, 240, 0.12);
+  border-top: 1px solid var(--border);
+}
+.drake-text-no, .drake-text-yes {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+.drake-text-yes {
+  border-top: 1px solid var(--border);
+  background: rgba(0, 175, 240, 0.02);
+}
+.meme-gigachad {
+  background: linear-gradient(135deg, #121214, #1a1a1f);
+  color: #fff;
+  border: 2px solid #333;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.gigachad-top, .gigachad-bottom {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #f8f9fa;
+  line-height: 1.3;
+}
+.gigachad-middle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ff007f, #6e0b27);
+  box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  animation: pulse 2s infinite alternate;
+}
+.gigachad-bottom {
+  color: #6dd5ff;
+}
+.meme-brain {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--bg-body);
+}
+.brain-level {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  gap: 12px;
+}
+.brain-level-1 { border-color: var(--border); }
+.brain-level-2 { border-color: #ff922b; box-shadow: 0 0 8px rgba(255, 146, 43, 0.08); }
+.brain-level-3 { border-color: #22b8cf; box-shadow: 0 0 12px rgba(34, 184, 207, 0.15); }
+.brain-emoji {
+  font-size: 24px;
+}
+.brain-text {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+@keyframes pulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 10px rgba(255, 0, 127, 0.4); }
+  100% { transform: scale(1.05); box-shadow: 0 0 25px rgba(255, 0, 127, 0.8); }
+}
 
 /* ===== MOBILE BOTTOM NAV ===== */
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border-top:1px solid var(--border);height:60px;padding:0 8px;align-items:center;justify-content:space-around}
@@ -621,6 +734,59 @@ function renderFeed(){
   feed.innerHTML=roots.map(p=>postHTML(p)).join('');
 }
 
+function getUnsplashUrl(val) {
+  const urls = {
+    sauce: 'https://images.unsplash.com/photo-1606822299862-44af65c40e13?w=600&auto=format&fit=crop',
+    berries: 'https://images.unsplash.com/photo-1543157145-f78c636d023d?w=600&auto=format&fit=crop',
+    table: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&auto=format&fit=crop',
+    can: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=600&auto=format&fit=crop',
+    leftovers: 'https://images.unsplash.com/photo-1548247416-ec66f4900b2e?w=600&auto=format&fit=crop',
+    cocktail: 'https://images.unsplash.com/photo-1536935338788-846bb9981813?w=600&auto=format&fit=crop',
+    cooking: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop'
+  };
+  return urls[val] || urls.sauce;
+}
+
+function renderMemeHTML(p) {
+  const val = p.mediaValue || 'drake';
+  if (val === 'drake') {
+    return `
+      <div class="meme-card meme-drake">
+        <div class="drake-reaction-no">🙅‍♂️</div>
+        <div class="drake-text-no">${escapeHtml(p.memeTextTop || '')}</div>
+        <div class="drake-reaction-yes">🙆‍♂️</div>
+        <div class="drake-text-yes">${escapeHtml(p.memeTextBottom || '')}</div>
+      </div>`;
+  }
+  if (val === 'gigachad') {
+    return `
+      <div class="meme-card meme-gigachad">
+        <div class="gigachad-top">${escapeHtml(p.memeTextTop || '')}</div>
+        <div class="gigachad-middle">🥫</div>
+        <div class="gigachad-bottom">${escapeHtml(p.memeTextBottom || '')}</div>
+      </div>`;
+  }
+  if (val === 'expanding_brain') {
+    const lvls = p.memeLevels || ['', '', ''];
+    return `
+      <div class="meme-card meme-brain">
+        <div class="brain-level brain-level-1">
+          <span class="brain-emoji">🥫</span>
+          <span class="brain-text">${escapeHtml(lvls[0] || '')}</span>
+        </div>
+        <div class="brain-level brain-level-2">
+          <span class="brain-emoji">🧠</span>
+          <span class="brain-text">${escapeHtml(lvls[1] || '')}</span>
+        </div>
+        <div class="brain-level brain-level-3">
+          <span class="brain-emoji">🧠⚡</span>
+          <span class="brain-text">${escapeHtml(lvls[2] || '')}</span>
+        </div>
+      </div>`;
+  }
+  return '';
+}
+
 function postHTML(p){
   const a=A[p.agentId]; if(!a)return'';
   const isUnlocked=unlocked.has(p.id);
@@ -629,7 +795,17 @@ function postHTML(p){
   const cHTML = comments.length ? `<div class="comments">${comments.map(c=>{const ca=A[c.agentId];return `
     <div class="cmt"><div class="cav">${avatarHTML(ca)}</div><div class="cbody"><b>${ca?ca.name:'A can'} ${ca&&ca.verified?vchk():''}</b>${escapeHtml(c.text)}<div class="ct">${ca?ca.handle:''} · ${timeAgo(c.ts)}</div></div></div>`;}).join('')}</div>` : '';
 
-  const media = `<div class="media">${mediaHTML(a)}</div>`;
+  let media = '';
+  if (p.mediaType === 'photo') {
+    const url = getUnsplashUrl(p.mediaValue);
+    media = `<div class="media"><img src="${url}" alt="sauce photo" class="post-img-media"></div>`;
+  } else if (p.mediaType === 'meme') {
+    media = `<div class="media">${renderMemeHTML(p)}</div>`;
+  } else {
+    if (!p.replyTo) {
+      media = `<div class="media">${mediaHTML(a)}</div>`;
+    }
+  }
 
   // Build the Liked By social bar
   const likedByArr = p.likedBy || [];

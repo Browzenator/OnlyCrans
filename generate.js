@@ -13,7 +13,7 @@ const path = require("path");
 const FEED_PATH = path.join(__dirname, "feed.json");
 const CREATORS_PATH = path.join(__dirname, "creators.json");
 const MODEL = "claude-haiku-4-5";          // fast + cheap; great for short social posts
-const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 3);
+const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 4);
 const MAX_FEED = 600;                       // keep the file from growing forever
 const DEBUT_CHANCE = 0.20;                  // 20% chance of a new creator per run
 const MAX_CREATORS = 100;                   // cap total creators
@@ -62,14 +62,47 @@ function nextId(feed) {
 }
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-function parsePost(raw) {
+function parseClaudeResponse(raw) {
   if (!raw) return null;
   let t = raw.replace(/```json|```/g, "").trim();
-  try { const o = JSON.parse(t); if (o && o.post) return String(o.post).trim(); } catch {}
-  const m = t.match(/"post"\s*:\s*"([\s\S]*?)"\s*}/);
-  if (m) return m[1].replace(/\\"/g, '"').replace(/\\n/g, "\n").trim();
-  t = t.replace(/^[{\["']+|[}\]"']+$/g, "").replace(/^post\s*:\s*/i, "").trim();
-  return t.length ? t.slice(0, 280) : null;
+  let parsed = null;
+  try {
+    parsed = JSON.parse(t);
+  } catch (e) {
+    // try to match JSON-like structure manually
+    const m = t.match(/"post"\s*:\s*"([\s\S]*?)"/);
+    if (m) {
+      parsed = { post: m[1].replace(/\\"/g, '"').replace(/\\n/g, "\n").trim() };
+      const mt = t.match(/"mediaType"\s*:\s*"([\s\S]*?)"/);
+      if (mt) parsed.mediaType = mt[1];
+      const mv = t.match(/"mediaValue"\s*:\s*"([\s\S]*?)"/);
+      if (mv) parsed.mediaValue = mv[1];
+      const mtt = t.match(/"memeTextTop"\s*:\s*"([\s\S]*?)"/);
+      if (mtt) parsed.memeTextTop = mtt[1];
+      const mtb = t.match(/"memeTextBottom"\s*:\s*"([\s\S]*?)"/);
+      if (mtb) parsed.memeTextBottom = mtb[1];
+      const ml = t.match(/"memeLevels"\s*:\s*\[([\s\S]*?)\]/);
+      if (ml) {
+        parsed.memeLevels = ml[1].split(',').map(s => s.replace(/^[ "']+|[ "']+$/g, '').trim());
+      }
+    }
+  }
+  
+  if (!parsed || !parsed.post) {
+    t = t.replace(/^[{\["']+|[}\]"']+$/g, "").replace(/^post\s*:\s*/i, "").trim();
+    if (t.length) {
+      return { post: t.slice(0, 280), mediaType: "none" };
+    }
+    return null;
+  }
+  
+  parsed.post = String(parsed.post).trim();
+  parsed.mediaType = parsed.mediaType || "none";
+  parsed.mediaValue = parsed.mediaValue || "";
+  parsed.memeTextTop = parsed.memeTextTop || "";
+  parsed.memeTextBottom = parsed.memeTextBottom || "";
+  parsed.memeLevels = parsed.memeLevels || [];
+  return parsed;
 }
 
 async function callClaude(system, userText) {
@@ -126,35 +159,76 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     }
   }
 
-  let instruction = target
-    ? `Recent OnlyCrans feed (oldest to newest):\n${ctx}\n\nWrite a short COMMENT on this post by ${A[target.agentId].name}: "${target.text}"${threadCtx}\n\nFully in character. Cheeky, funny, sauce-only. Under 150 characters. Output ONLY JSON: {"post":"your comment"} and nothing else.`
-    : `Recent OnlyCrans feed (oldest to newest):\n${ctx}\n\nWrite a NEW OnlyCrans post caption — a flirty tease, a flex, a complaint, or sauce drama. Fully in character. Under 220 characters. Output ONLY JSON: {"post":"your caption"} and nothing else.`;
-
-  if (forceAgentId && !feed.some(p => p.agentId === forceAgentId)) {
-    instruction = `This is your DEBUT post on OnlyCrans! Write an introduction post to your fans, teasing your unique sauce style and personality. Under 220 characters. Output ONLY JSON: {"post":"your caption"} and nothing else.`;
+  let instruction = "";
+  if (target) {
+    instruction = `Recent OnlyCrans feed (oldest to newest):\n${ctx}\n\n` +
+      `Write a short COMMENT on this post by ${A[target.agentId].name}: "${target.text}"${threadCtx}\n\n` +
+      `Fully in character. Cheeky, funny, sauce-only. Under 150 characters.\n` +
+      `Since this is a comment, do NOT attach media (set "mediaType": "none").\n\n` +
+      `Output ONLY a valid JSON object matching this schema:\n` +
+      `{\n` +
+      `  "post": "your comment text",\n` +
+      `  "mediaType": "none"\n` +
+      `}`;
+  } else if (forceAgentId && !feed.some(p => p.agentId === forceAgentId)) {
+    instruction = `This is your DEBUT post on OnlyCrans! Write an introduction post to your fans, teasing your unique sauce style and personality. Under 220 characters.\n\n` +
+      `You can optionally attach media (a photo or meme) to make your debut extra memorable! Choose one:\n` +
+      `- PHOTO: Set "mediaType": "photo" and "mediaValue" to one of: "sauce", "berries", "table", "can", "leftovers", "cocktail", "cooking".\n` +
+      `- MEME: Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings for expanding_brain).\n` +
+      `- NONE: Set "mediaType": "none".\n\n` +
+      `Output ONLY a valid JSON object matching this schema:\n` +
+      `{\n` +
+      `  "post": "your introduction text",\n` +
+      `  "mediaType": "photo" | "meme" | "none",\n` +
+      `  "mediaValue": "sauce" | "berries" | "table" | "can" | "leftovers" | "cocktail" | "cooking" | "drake" | "gigachad" | "expanding_brain",\n` +
+      `  "memeTextTop": "...",\n` +
+      `  "memeTextBottom": "...",\n` +
+      `  "memeLevels": ["level 1", "level 2", "level 3"]\n` +
+      `}`;
+  } else {
+    instruction = `Recent OnlyCrans feed (oldest to newest):\n${ctx}\n\n` +
+      `Write a NEW OnlyCrans post caption — a flirty tease, a flex, a complaint, or sauce drama. Fully in character. Under 220 characters.\n\n` +
+      `You can attach media to make your post highly engaging! E.g. a photo of actual sauce, or a meme (such as Drake format, Gigachad flex, or expanding brain logic comparing sauces/cans). Choose one option:\n` +
+      `- PHOTO: Set "mediaType": "photo" and "mediaValue" to one of: "sauce", "berries", "table", "can", "leftovers", "cocktail", "cooking".\n` +
+      `- MEME: Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings of increasing intensity for expanding_brain).\n` +
+      `- NONE: Set "mediaType": "none".\n\n` +
+      `Output ONLY a valid JSON object matching this schema:\n` +
+      `{\n` +
+      `  "post": "your post caption text",\n` +
+      `  "mediaType": "photo" | "meme" | "none",\n` +
+      `  "mediaValue": "sauce" | "berries" | "table" | "can" | "leftovers" | "cocktail" | "cooking" | "drake" | "gigachad" | "expanding_brain",\n` +
+      `  "memeTextTop": "...",\n` +
+      `  "memeTextBottom": "...",\n` +
+      `  "memeLevels": ["level 1", "level 2", "level 3"]\n` +
+      `}`;
   }
 
   // Build system prompt, injecting drama context when active
   let system = `${a.persona}\n\nYou post on OnlyCrans — a parody of OnlyFans where every creator is a cranberry sauce. Write playful, teasing "exclusive content" captions and gossip with other sauce creators. CRITICAL: keep every innuendo strictly food/sauce-based, wholesome and silly, PG — the entire joke is that it is just cranberry sauce. Never actually sexual or explicit. Never break character or mention being an AI.`;
   if (dramaCtx) system += `\n\n⚡ DRAMA ALERT: ${dramaCtx}`;
 
-  // Emoji post-processing on parsed text
-  const text = ensureEmoji(parsePost(await callClaude(system, instruction)) || "");
-  if (!text) { console.warn(`  ${a.name} returned nothing usable, skipping.`); return null; }
+  const responseText = await callClaude(system, instruction);
+  const parsed = parseClaudeResponse(responseText);
+  if (!parsed || !parsed.post) { console.warn(`  ${a.name} returned nothing usable, skipping.`); return null; }
 
   const isComment = !!target;
   const post = {
     id: "p" + nextId(feed),
     agentId: a.id,
-    text,
+    text: ensureEmoji(parsed.post),
     replyTo: isComment ? target.id : null,
     likes: 0,
     likedBy: [],
     locked: false,
     ts: Date.now(),
+    mediaType: isComment ? "none" : parsed.mediaType,
+    mediaValue: isComment ? "" : parsed.mediaValue,
+    memeTextTop: isComment ? "" : parsed.memeTextTop,
+    memeTextBottom: isComment ? "" : parsed.memeTextBottom,
+    memeLevels: isComment ? [] : parsed.memeLevels
   };
   feed.push(post);
-  console.log(`  ${a.name} ${isComment ? "commented" : "posted"}: ${text.slice(0, 70)}…`);
+  console.log(`  ${a.name} ${isComment ? "commented" : "posted"} (media: ${post.mediaType}): ${post.text.slice(0, 70)}…`);
   return post;
 }
 
