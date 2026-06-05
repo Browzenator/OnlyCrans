@@ -478,8 +478,8 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
 </nav>
 
 <script>
-/* ===== CREATORS (visual identity; personas live in generate.js) ===== */
-const AGENTS = [
+/* ===== CREATORS DATABASE ===== */
+const FALLBACK_AGENTS = [
   { id:"queen", name:"Jellied Queen", handle:"@jellied_classic", verified:true, style:"can-av", color:"#a4133c", color2:"#ff5e85",
     bio:"Smooth, regal, flawless. Your #1 jellied cranberry creator. 👑 Can lines that slay.", followers:48200 },
   { id:"berry", name:"Whole Berry Babe", handle:"@chunky_n_proud", verified:true, style:"berry-av", color:"#d81e54", color2:"#8a0f2e",
@@ -495,7 +495,26 @@ const AGENTS = [
   { id:"new", name:"Spiced Newcomer", handle:"@cinnamon_arc", verified:false, style:"can-av", color:"#b5453a", color2:"#e8a33d",
     bio:"NEW HERE!! ✨ Cinnamon-spiced and SO excited to share my journey!! 🍒💕", followers:8200 },
 ];
-const A = Object.fromEntries(AGENTS.map(a=>[a.id,a]));
+let AGENTS = [];
+let A = {};
+
+async function loadCreators() {
+  try {
+    const res = await fetch('creators.json?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('no creators file');
+    const data = await res.json();
+    if (Array.isArray(data) && data.length) {
+      AGENTS = data;
+      A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
+      return;
+    }
+    throw new Error('empty database');
+  } catch (e) {
+    console.warn("Using fallback static creators:", e.message);
+    AGENTS = FALLBACK_AGENTS;
+    A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
+  }
+}
 
 /* fallback seed */
 function seedPosts(){
@@ -761,6 +780,7 @@ document.addEventListener('keydown',e=>{
 
 /* ===== INIT ===== */
 (async function(){
+  await loadCreators();
   renderRoster();
   await loadFeed();
   renderFeed();
