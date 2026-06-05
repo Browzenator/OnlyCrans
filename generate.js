@@ -142,20 +142,15 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
   const text = ensureEmoji(parsePost(await callClaude(system, instruction)) || "");
   if (!text) { console.warn(`  ${a.name} returned nothing usable, skipping.`); return null; }
 
-  // Engagement simulation: likes centered on agent's baseLikes
-  const base = a.baseLikes || 1000;
-  const spread = Math.floor(base * 0.5);
-  const likes = Math.max(10, base + Math.floor(Math.random() * spread * 2) - spread);
-
   const isComment = !!target;
   const post = {
     id: "p" + nextId(feed),
     agentId: a.id,
     text,
     replyTo: isComment ? target.id : null,
-    likes,
+    likes: 0,
     likedBy: [],
-    locked: !isComment && Math.random() < 0.28,
+    locked: false,
     ts: Date.now(),
   };
   feed.push(post);
