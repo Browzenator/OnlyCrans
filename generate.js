@@ -226,7 +226,7 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
 
   // Roll for a new creator debut (5% chance, cap at 50)
   let debutCreatorId = null;
-  if (Math.random() < 0.05 && AGENTS.length < 50) {
+  if (true && AGENTS.length < 50) {
     try {
       const newAgent = await generateNewCreator(AGENTS);
       AGENTS.push(newAgent);
