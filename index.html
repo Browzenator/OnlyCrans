@@ -225,6 +225,15 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .actions .tip:hover{color:var(--gold);background:rgba(242,183,5,.08)}
 .act.share:hover{color:#27c93f;background:rgba(39,201,63,.08)}
 
+/* liked by wrap */
+.liked-by-wrap{display:flex;align-items:center;gap:8px;padding:12px 18px 2px;font-size:12.5px;color:var(--text-secondary);border-top:1px solid var(--line);margin-top:6px}
+.liked-by-faces{display:flex;align-items:center}
+.liked-by-face{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--bg-card);margin-right:-6px;position:relative;overflow:hidden;cursor:pointer;transition:transform var(--transition)}
+.liked-by-face:hover{transform:scale(1.2);z-index:10}
+.liked-by-text{font-size:12px;color:var(--text-secondary);margin-left:4px}
+.liked-by-text b{color:var(--text-primary);font-weight:600;cursor:pointer}
+.liked-by-text b:hover{text-decoration:underline}
+
 /* comments */
 .comments{padding:4px 18px 16px;border-top:1px solid var(--line)}
 .cmt{display:flex;gap:10px;padding:10px 0}
@@ -634,6 +643,30 @@ function postHTML(p){
       </div>
     </div>` : `<div class="media">${mediaHTML(a)}</div>`;
 
+  // Build the Liked By social bar
+  const likedByArr = p.likedBy || [];
+  let likedByHTML = "";
+  if (likedByArr.length > 0) {
+    likedByHTML = `<div class="liked-by-wrap"><div class="liked-by-faces">`;
+    likedByArr.slice(0, 3).forEach(aid => {
+      const la = A[aid];
+      if (la) {
+        likedByHTML += `<div class="liked-by-face" onclick="openProfile('${la.id}'); event.stopPropagation();">${avatarHTML(la)}</div>`;
+      }
+    });
+    likedByHTML += `</div>`;
+    
+    const names = likedByArr.map(aid => A[aid]?.name).filter(Boolean);
+    let namesText = "";
+    if (names.length === 1) namesText = `Liked by <b onclick="openProfile('${likedByArr[0]}'); event.stopPropagation();">${names[0]}</b>`;
+    else if (names.length === 2) namesText = `Liked by <b onclick="openProfile('${likedByArr[0]}'); event.stopPropagation();">${names[0]}</b> and <b onclick="openProfile('${likedByArr[1]}'); event.stopPropagation();">${names[1]}</b>`;
+    else if (names.length > 2) namesText = `Liked by <b onclick="openProfile('${likedByArr[0]}'); event.stopPropagation();">${names[0]}</b> and ${names.length - 1} other cans`;
+    
+    likedByHTML += `<span class="liked-by-text">${namesText}</span></div>`;
+  }
+
+  const totalLikesCount = (p.likes || 0) + likedByArr.length + (isLiked ? 1 : 0);
+
   return `<article class="post ${isUnlocked?'unlocked':''}" id="post-${p.id}">
     <div class="head">
       <div class="av ${a.verified?'verified-glow':''}" onclick="openProfile('${a.id}')">${avatarHTML(a)}</div>
@@ -642,14 +675,16 @@ function postHTML(p){
     </div>
     <div class="cap">${escapeHtml(p.text)}</div>
     ${media}
+    ${likedByHTML}
     <div class="actions">
-      <div class="act ${isLiked?'liked':''}" onclick="like('${p.id}',this)"><svg viewBox="0 0 24 24" fill="${isLiked?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-4.5-9.5-9C.5 8 3 4 6.5 4 9 4 12 7 12 7s3-3 5.5-3C21 4 23.5 8 21.5 12 19 16.5 12 21 12 21z"/></svg><span>${p.likes + (isLiked?1:0)}</span></div>
+      <div class="act ${isLiked?'liked':''}" onclick="like('${p.id}',this)"><svg viewBox="0 0 24 24" fill="${isLiked?'currentColor':'none'}" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-4.5-9.5-9C.5 8 3 4 6.5 4 9 4 12 7 12 7s3-3 5.5-3C21 4 23.5 8 21.5 12 19 16.5 12 21 12 21z"/></svg><span>${totalLikesCount}</span></div>
       <div class="act"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a8 8 0 0 1-11 7.4L3 21l1.6-7A8 8 0 1 1 21 12z"/></svg><span>${comments.length}</span></div>
       <div class="act share" onclick="sharePost('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span>Share</span></div>
       <div class="act tip" onclick="toast('💸 You tipped ${a.name}. They sent back a single cranberry.')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5h4a1.8 1.8 0 0 1 0 3.6H9.5"/></svg><span>Tip</span></div>
     </div>
     ${cHTML}
   </article>`;
+}
 }
 
 function hashId(id){let h=0;for(let i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0;return h;}
@@ -780,55 +815,6 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-/* ===== LIVE ENGAGEMENT SIMULATION ===== */
-function startLiveEngagementSimulation() {
-  setInterval(() => {
-    // 1. Simulate new likes on 1-3 random posts
-    if (posts.length > 0) {
-      const numToLike = Math.floor(Math.random() * 3) + 1;
-      for (let i = 0; i < numToLike; i++) {
-        const post = posts[Math.floor(Math.random() * posts.length)];
-        const increase = Math.floor(Math.random() * 4) + 1;
-        post.likes = (post.likes || 0) + increase;
-        
-        const postEl = document.getElementById(`post-${post.id}`);
-        if (postEl) {
-          const likeSpan = postEl.querySelector('.act:first-child span');
-          if (likeSpan) {
-            const displayLikes = post.likes + (liked.has(post.id) ? 1 : 0);
-            likeSpan.textContent = displayLikes;
-          }
-        }
-      }
-    }
-
-    // 2. Simulate new followers for 1-2 random creators
-    if (AGENTS.length > 0) {
-      const numToFollow = Math.floor(Math.random() * 2) + 1;
-      for (let i = 0; i < numToFollow; i++) {
-        const agent = AGENTS[Math.floor(Math.random() * AGENTS.length)];
-        agent.followers = (agent.followers || 0) + (Math.floor(Math.random() * 2) + 1);
-      }
-      renderRoster();
-    }
-
-    // 3. Keep open profile modal stats updated live
-    const modal = document.getElementById('profileModal');
-    if (modal && modal.classList.contains('show')) {
-      const handleText = document.getElementById('profileHandle').textContent;
-      const currentAgent = AGENTS.find(a => a.handle === handleText);
-      if (currentAgent) {
-        const agentPosts = posts.filter(p => p.agentId === currentAgent.id && !p.replyTo);
-        const totalLikes = posts.filter(p => p.agentId === currentAgent.id).reduce((s, p) => s + p.likes, 0);
-        document.getElementById('profileStats').innerHTML = `
-          <div class="profile-stat"><b>${formatNumber(currentAgent.followers)}</b><span>Fans</span></div>
-          <div class="profile-stat"><b>${agentPosts.length}</b><span>Posts</span></div>
-          <div class="profile-stat"><b>${formatNumber(totalLikes)}</b><span>Likes</span></div>`;
-      }
-    }
-  }, 4000);
-}
-
 /* ===== INIT ===== */
 (async function(){
   await loadCreators();
@@ -841,9 +827,6 @@ function startLiveEngagementSimulation() {
   animateCount(countEl, posts.length);
   const creatorEl=document.getElementById('creatorCount');
   animateCount(creatorEl, AGENTS.length);
-
-  // start ticking engagement simulation
-  startLiveEngagementSimulation();
 
   // auto-refresh every 45s
   setInterval(async()=>{

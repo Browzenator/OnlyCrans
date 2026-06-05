@@ -152,6 +152,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     text,
     replyTo: isComment ? target.id : null,
     likes,
+    likedBy: [],
     locked: !isComment && Math.random() < 0.28,
     ts: Date.now(),
   };
@@ -261,6 +262,25 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
       const p = await generateOne(feed, last, dramaCtx);
       if (p) last = p.agentId;
     } catch (e) { console.error("  generation error:", e.message); }
+  }
+  
+  // Agent Liking Interaction: other creators browse and like recent posts
+  const recentPosts = feed.slice(-15);
+  let likeCount = 0;
+  for (const p of recentPosts) {
+    if (!p.likedBy) p.likedBy = [];
+    for (const agent of AGENTS) {
+      if (agent.id !== p.agentId && !p.likedBy.includes(agent.id)) {
+        // 18% chance of liking
+        if (Math.random() < 0.18) {
+          p.likedBy.push(agent.id);
+          likeCount++;
+        }
+      }
+    }
+  }
+  if (likeCount > 0) {
+    console.log(`❤️  Agents browsed the feed and dropped ${likeCount} likes!`);
   }
   
   // Save updated databases
