@@ -420,20 +420,33 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
   }
 
   let last = feed.length ? feed[feed.length - 1].agentId : null;
+  let errors = [];
 
   // If a new creator debuted, they post FIRST
   if (debutCreatorId) {
     try {
       const p = await generateOne(feed, last, dramaCtx, debutCreatorId);
       if (p) last = p.agentId;
-    } catch (e) { console.error("  debut post error:", e.message); }
+    } catch (e) {
+      console.error("  debut post error:", e);
+      errors.push(`Debut post error: ${e.message}\n${e.stack}`);
+    }
   }
 
   for (let i = 0; i < POSTS_PER_RUN; i++) {
     try {
       const p = await generateOne(feed, last, dramaCtx);
       if (p) last = p.agentId;
-    } catch (e) { console.error("  generation error:", e.message); }
+    } catch (e) {
+      console.error("  generation error:", e);
+      errors.push(`Generation error (run ${i}): ${e.message}\n${e.stack}`);
+    }
+  }
+  
+  if (errors.length > 0) {
+    fs.writeFileSync(path.join(__dirname, "generate_error.log"), errors.join("\n\n"));
+  } else {
+    try { fs.unlinkSync(path.join(__dirname, "generate_error.log")); } catch (e) {}
   }
   
 
