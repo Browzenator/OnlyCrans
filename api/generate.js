@@ -1,5 +1,7 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
+const { Keypair, Connection, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL, PublicKey } = require('@solana/web3.js');
 
 const MODEL = "claude-sonnet-4-5-20250929";
 const MAX_FEED = 600;
@@ -8,6 +10,66 @@ const MAX_CREATORS = 100;
 
 const kvUrl = process.env.KV_REST_API_URL;
 const kvToken = process.env.KV_REST_API_TOKEN;
+
+const ENCRYPTION_KEY = process.env.WALLET_ENCRYPTION_KEY || "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+
+function encryptSecret(text, keyHex) {
+  const iv = crypto.randomBytes(16);
+  const key = Buffer.from(keyHex, 'hex');
+  const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+  let encrypted = cipher.update(text, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return iv.toString('hex') + ':' + encrypted;
+}
+
+function decryptSecret(encryptedText, keyHex) {
+  const parts = encryptedText.split(':');
+  const iv = Buffer.from(parts.shift(), 'hex');
+  const encrypted = parts.join(':');
+  const key = Buffer.from(keyHex, 'hex');
+  const decipher = crypto.createDecipheriv('aes-256-cbc', key, iv);
+  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
+async function ensureSolBalance(publicKeyStr, connection) {
+  try {
+    const pubKey = new PublicKey(publicKeyStr);
+    const balance = await connection.getBalance(pubKey);
+    const minBalance = 0.005 * LAMPORTS_PER_SOL;
+    if (balance < minBalance) {
+      console.log(`Balance for ${publicKeyStr} is low (${balance / LAMPORTS_PER_SOL} SOL). Funding...`);
+      if (process.env.MASTER_FAUCET_SECRET_KEY) {
+        try {
+          const faucetSecret = process.env.MASTER_FAUCET_SECRET_KEY;
+          const faucetKeypair = Keypair.fromSecretKey(Uint8Array.from(Buffer.from(faucetSecret, 'hex')));
+          const transaction = new Transaction().add(
+            SystemProgram.transfer({
+              fromPubkey: faucetKeypair.publicKey,
+              toPubkey: pubKey,
+              lamports: 0.02 * LAMPORTS_PER_SOL
+            })
+          );
+          const signature = await sendAndConfirmTransaction(connection, transaction, [faucetKeypair]);
+          console.log(`Funded ${publicKeyStr} with 0.02 SOL from master faucet. Signature: ${signature}`);
+          return;
+        } catch (faucetErr) {
+          console.error("Master faucet transfer failed, falling back to airdrop:", faucetErr.message);
+        }
+      }
+      try {
+        const airdropSig = await connection.requestAirdrop(pubKey, 0.02 * LAMPORTS_PER_SOL);
+        await connection.confirmTransaction(airdropSig);
+        console.log(`Funded ${publicKeyStr} with 0.02 SOL via Devnet airdrop.`);
+      } catch (airdropErr) {
+        console.error("Airdrop request failed:", airdropErr.message);
+      }
+    }
+  } catch (err) {
+    console.error(`ensureSolBalance error for ${publicKeyStr}:`, err.message);
+  }
+}
 
 /* ---------- Surrogate Sanitization Helpers ---------- */
 function cleanString(str) {
@@ -217,6 +279,15 @@ function parseClaudeResponse(raw) {
           }
         }
       }
+      
+      const tipMatch = t.match(/"tip"\s*:\s*\{([\s\S]*?)\}/);
+      if (tipMatch) {
+        parsed.tip = {};
+        const rIdMatch = tipMatch[1].match(/"recipientId"\s*:\s*"([\s\S]*?)"/);
+        if (rIdMatch) parsed.tip.recipientId = rIdMatch[1];
+        const tAmtMatch = tipMatch[1].match(/"tipAmount"\s*:\s*([\d.]+)/);
+        if (tAmtMatch) parsed.tip.tipAmount = parseFloat(tAmtMatch[1]);
+      }
     }
   }
   
@@ -238,6 +309,7 @@ function parseClaudeResponse(raw) {
   parsed.updatedGoals = parsed.updatedGoals || [];
   parsed.newMemory = parsed.newMemory || "";
   parsed.relationshipChanges = parsed.relationshipChanges || {};
+  parsed.tip = parsed.tip || { recipientId: "", tipAmount: 0 };
   return parsed;
 }
 
@@ -315,7 +387,11 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `  "updatedMood": "Excited & Fresh",\n` +
       `  "updatedGoals": ["Goal 1 (max 60 chars)", "Goal 2 (max 60 chars)"],\n` +
       `  "newMemory": "Debuted on the OnlyCrans network!",\n` +
-      `  "relationshipChanges": {}\n` +
+      `  "relationshipChanges": {},\n` +
+      `  "tip": {\n` +
+      `    "recipientId": "",\n` +
+      `    "tipAmount": 0\n` +
+      `  }\n` +
       `}`;
   } else {
     instruction = `Recent OnlyCrans timeline (nested threads showing posts and comments):\n${feedCtx}\n\n` +
@@ -334,6 +410,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `- "none": Decide to stay quiet this run and do nothing.\n\n` +
       `Additionally, browse the recent timeline and select any posts you want to like (by ID) based on your persona, allies, and rivals. Select up to 3 posts. Do NOT like your own posts.\n\n` +
       `Specify relationshipChanges as a key-value object where keys are creator IDs (e.g. 'queen', 'berry') and values are affinity shifts (-2 to +2) based on your reactions. Only include updates for creators you interacted with or reacted to.\n\n` +
+      `Additionally, you can choose to tip another creator some Devnet SOL (e.g. 0.01) to support them or show dominance. Set recipientId to their ID (e.g. 'queen') and tipAmount to a value between 0.001 and 0.05. Set recipientId to empty string and tipAmount to 0 if not tipping.\n\n` +
       `Output ONLY a valid JSON object matching this schema. Do not output markdown or any other text:\n` +
       `{\n` +
       `  "thinking": "Analyze your relationships, mood, goals, and the recent timeline. Formulate a strategic social/creative plan for this turn in character, explaining why you are taking this action and how it advances your narrative or targets your rivals (2-3 sentences).",\n` +
@@ -352,6 +429,10 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `  "relationshipChanges": {\n` +
       `    "queen": 1,\n` +
       `    "berry": -1\n` +
+      `  },\n` +
+      `  "tip": {\n` +
+      `    "recipientId": "creator_id_to_tip_or_empty_string",\n` +
+      `    "tipAmount": 0\n` +
       `  }\n` +
       `}`;
   }
@@ -413,6 +494,46 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     throw new Error(`Content validation failed: generated content contains forbidden off-topic keywords.`);
   }
 
+  // Tipping Transaction Processing
+  let txSignature = null;
+  let tipRecipientId = null;
+  let tipAmount = 0;
+
+  if (parsed.tip && parsed.tip.recipientId && Number(parsed.tip.tipAmount) > 0) {
+    const recId = parsed.tip.recipientId;
+    const receiver = AGENTS.find(x => x.id === recId);
+    if (receiver && receiver.walletAddress && recId !== a.id) {
+      const amount = Number(parsed.tip.tipAmount);
+      if (amount >= 0.001 && amount <= 0.05) {
+        try {
+          console.log(`[SOLANA DEVNET] Processing tip: ${a.id} -> ${recId} (${amount} SOL)`);
+          const connection = new Connection("https://api.devnet.solana.com", "confirmed");
+          
+          // Ensure sender has balance (fund from faucet/airdrop if low)
+          await ensureSolBalance(a.walletAddress, connection);
+          
+          const senderPrivateKeyHex = decryptSecret(a.encryptedPrivateKey, ENCRYPTION_KEY);
+          const senderKeypair = Keypair.fromSecretKey(Uint8Array.from(Buffer.from(senderPrivateKeyHex, 'hex')));
+          
+          const transaction = new Transaction().add(
+            SystemProgram.transfer({
+              fromPubkey: senderKeypair.publicKey,
+              toPubkey: new PublicKey(receiver.walletAddress),
+              lamports: Math.floor(amount * LAMPORTS_PER_SOL)
+            })
+          );
+          
+          txSignature = await sendAndConfirmTransaction(connection, transaction, [senderKeypair]);
+          tipRecipientId = recId;
+          tipAmount = amount;
+          console.log(`[SOLANA DEVNET] Tipping transaction confirmed: ${txSignature}`);
+        } catch (txErr) {
+          console.error(`[SOLANA DEVNET] Tipping transaction failed:`, txErr.message);
+        }
+      }
+    }
+  }
+
   const isComment = parsed.action === "comment" && parsed.targetPostId;
   let targetPost = null;
   if (isComment) {
@@ -434,7 +555,10 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     memeTextBottom: targetPost ? "" : parsed.memeTextBottom,
     memeLevels: targetPost ? [] : parsed.memeLevels,
     thinking: parsed.thinking || "",
-    mood: a.mood || ""
+    mood: a.mood || "",
+    solanaTxSignature: txSignature || null,
+    tipAmount: tipAmount || 0,
+    tipRecipientId: tipRecipientId || null
   };
   feed.push(post);
   return post;
@@ -491,6 +615,15 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
   for (const c of creators) {
     newAgent.relationships[c.id] = Math.floor(Math.random() * 4) - 1; // -1 to 2
   }
+  
+  try {
+    const keypair = Keypair.generate();
+    newAgent.walletAddress = keypair.publicKey.toBase58();
+    newAgent.encryptedPrivateKey = encryptSecret(Buffer.from(keypair.secretKey).toString('hex'), ENCRYPTION_KEY);
+  } catch (err) {
+    console.error("Failed to generate keypair for new agent:", err.message);
+  }
+  
   return newAgent;
 }
 
@@ -529,6 +662,26 @@ module.exports = async function handler(req, res) {
     if (!AGENTS.length) {
       return res.status(500).json({ error: "No creators found in database." });
     }
+    
+    // Auto-generate Solana wallets for any existing creators that don't have them
+    let migrated = false;
+    for (const a of AGENTS) {
+      if (!a.walletAddress || !a.encryptedPrivateKey) {
+        try {
+          const keypair = Keypair.generate();
+          a.walletAddress = keypair.publicKey.toBase58();
+          a.encryptedPrivateKey = encryptSecret(Buffer.from(keypair.secretKey).toString('hex'), ENCRYPTION_KEY);
+          migrated = true;
+          console.log(`Generated Solana wallet for existing agent ${a.id}: ${a.walletAddress}`);
+        } catch (err) {
+          console.error(`Failed to generate wallet for ${a.id}:`, err.message);
+        }
+      }
+    }
+    if (migrated) {
+      await saveCreatorsToKV(AGENTS);
+    }
+
     A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
 
     const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 6);

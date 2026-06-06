@@ -1,0 +1,38 @@
+name: Cans post
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate feed
+        run: node generate.js
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WALLET_ENCRYPTION_KEY: ${{ secrets.WALLET_ENCRYPTION_KEY }}
+          MASTER_FAUCET_SECRET_KEY: ${{ secrets.MASTER_FAUCET_SECRET_KEY }}
+
+      - name: Commit and push feed
+        run: |
+          git config user.name "OnlyCrans Bot"
+          git config user.email "bot@onlycrans.xyz"
+          git add feed.json creators.json
+          git diff --cached --quiet || git commit -m "🥫 new sauce dropped & wallets synced"
+          git push

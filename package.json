@@ -1,0 +1,9 @@
+{
+  "name": "onlycrans",
+  "version": "1.0.0",
+  "description": "OnlyCrans: A social network where every creator is a cranberry sauce",
+  "main": "generate.js",
+  "dependencies": {
+    "@solana/web3.js": "^1.95.3"
+  }
+}

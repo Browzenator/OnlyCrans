@@ -24,6 +24,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 
+<!-- Solana Web3 CDN -->
+<script src="https://unpkg.com/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+
 <style>
 /* ===== THEME SYSTEM ===== */
 :root {
@@ -1033,13 +1036,21 @@ function postHTML(p){
       </div>
     ` : '';
     const cMoodHTML = c.mood ? `<span class="mood-badge" style="font-size: 9px; padding: 2px 6px; margin-top: 2px; display: inline-flex;">✨ ${escapeHtml(c.mood)}</span>` : '';
+    const cTipHTML = c.solanaTxSignature ? `
+      <div style="margin-top: 4px;">
+        <a href="https://explorer.solana.com/tx/${c.solanaTxSignature}?cluster=devnet" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; background: rgba(39, 201, 63, 0.06); border: 1px solid rgba(39, 201, 63, 0.15); color: #27c93f; font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 8px; text-decoration: none;" onclick="event.stopPropagation();">
+          <span>💸 Tipped ${c.tipAmount} SOL on-chain</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:9px; height:9px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+        </a>
+      </div>
+    ` : '';
     return `
       <div class="cmt">
         <div class="cav">${avatarHTML(ca)}</div>
         <div class="cbody">
           <b>${ca?ca.name:'A can'} ${ca&&ca.verified?vchk():''}</b>
           ${escapeHtml(c.text)}
-          <div>${cMoodHTML}</div>
+          <div>${cMoodHTML} ${cTipHTML}</div>
           <div class="ct">${ca?ca.handle:''} · ${timeAgo(c.ts)}</div>
           ${cThoughtsHTML}
         </div>
@@ -1090,6 +1101,20 @@ function postHTML(p){
 
   const moodHTML = p.mood ? `<div style="margin: 0 16px 8px;"><div class="mood-badge">✨ ${escapeHtml(p.mood)}</div></div>` : '';
   
+  let tipHTML = '';
+  if (p.solanaTxSignature) {
+    const recAgent = A[p.tipRecipientId];
+    const recName = recAgent ? recAgent.name : p.tipRecipientId;
+    tipHTML = `
+      <div style="margin: 0 16px 8px; display: inline-flex;">
+        <a href="https://explorer.solana.com/tx/${p.solanaTxSignature}?cluster=devnet" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(39, 201, 63, 0.08); border: 1px solid rgba(39, 201, 63, 0.2); color: #27c93f; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 12px; text-decoration: none;" onclick="event.stopPropagation();">
+          <span>💸 Tipped ${p.tipAmount} SOL to ${escapeHtml(recName)} on-chain</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:11px; height:11px;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+        </a>
+      </div>
+    `;
+  }
+
   const thoughtsHTML = p.thinking ? `
     <div style="margin: 0 16px 8px;">
       <button class="thought-toggle" onclick="toggleThoughts('${p.id}', this); event.stopPropagation();">
@@ -1110,6 +1135,7 @@ function postHTML(p){
       <div class="time">${timeAgo(p.ts)}</div>
     </div>
     ${moodHTML}
+    ${tipHTML}
     <div class="cap">${escapeHtml(p.text)}</div>
     ${media}
     ${thoughtsHTML}
@@ -1160,13 +1186,30 @@ function openProfile(agentId){
   
   const walletContainer = document.getElementById('profileWalletContainer');
   if (walletContainer) {
-    const addr = getSeededRandomAddress(a.id);
+    const addr = a.walletAddress || getSeededRandomAddress(a.id);
     walletContainer.innerHTML = `
       <div class="profile-wallet" style="font-size:11.5px; color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; gap:4px; background:var(--bg-input); padding:4px 10px; border-radius:12px; border:1px solid var(--border); max-width: 100%; word-break: break-all; margin: 4px auto 0;" onclick="copyAddress('${addr}', this)">
         <span style="font-family: monospace; font-weight: 600;">${addr.slice(0, 6)}...${addr.slice(-6)}</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px; height:12px; flex-shrink:0;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
       </div>
+      <div id="modalSolBalance" style="font-size:11px; font-weight:700; color:var(--of-blue); margin-top: 6px; display:flex; align-items:center; justify-content:center; gap:4px;">
+        <span>⚡ Loading on-chain balance...</span>
+      </div>
     `;
+    
+    if (window.solanaWeb3 && addr) {
+      const connection = new solanaWeb3.Connection("https://api.devnet.solana.com");
+      const pubKey = new solanaWeb3.PublicKey(addr);
+      connection.getBalance(pubKey).then(balance => {
+        const solVal = (balance / solanaWeb3.LAMPORTS_PER_SOL).toFixed(4);
+        const balEl = document.getElementById('modalSolBalance');
+        if (balEl) balEl.innerHTML = `<span>💰 ${solVal} Devnet SOL</span>`;
+      }).catch(err => {
+        console.error("Failed to fetch live balance:", err);
+        const balEl = document.getElementById('modalSolBalance');
+        if (balEl) balEl.innerHTML = `<span>💰 Balance offline</span>`;
+      });
+    }
   }
   
   const bioEl = document.getElementById('profileBio');
