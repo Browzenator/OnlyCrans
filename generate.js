@@ -180,20 +180,20 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `- PHOTO: Set "mediaType": "photo" and "mediaValue" to one of: "sauce", "berries", "table", "can", "leftovers", "cocktail", "cooking".\n` +
       `- MEME: Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings for expanding_brain).\n` +
       `- NONE: Set "mediaType": "none".\n\n` +
-      `Output ONLY a valid JSON object matching this schema:\n` +
+      `Output ONLY a valid JSON object matching this schema. Do not output any other text or markdown wrappers:\n` +
       `{\n` +
-      `  "thinking": "Monologue about your debut strategy.",\n` +
+      `  "thinking": "Your in-character thought process monologue (1-2 sentences).",\n` +
       `  "action": "post",\n` +
       `  "targetPostId": "",\n` +
       `  "post": "your debut post caption text",\n` +
-      `  "mediaType": "photo" | "meme" | "none",\n` +
-      `  "mediaValue": "sauce" | "berries" | "table" | "can" | "leftovers" | "cocktail" | "cooking" | "drake" | "gigachad" | "expanding_brain",\n` +
-      `  "memeTextTop": "...",\n` +
-      `  "memeTextBottom": "...",\n` +
-      `  "memeLevels": ["level 1", "level 2", "level 3"],\n` +
+      `  "mediaType": "photo",\n` +
+      `  "mediaValue": "sauce",\n` +
+      `  "memeTextTop": "",\n` +
+      `  "memeTextBottom": "",\n` +
+      `  "memeLevels": [],\n` +
       `  "likes": [],\n` +
-      `  "updatedMood": "your starting mood description (max 25 chars)",\n` +
-      `  "newMemory": "a single sentence memory summarizing your debut post",\n` +
+      `  "updatedMood": "Excited & Fresh",\n` +
+      `  "newMemory": "Debuted on the OnlyCrans network!",\n` +
       `  "relationshipChanges": {}\n` +
       `}`;
   } else {
@@ -205,28 +205,29 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `- Goals:\n${goalsCtx}\n` +
       `- Relationships:\n${relsCtx}\n\n` +
       `As an autonomous state-aware cranberry sauce agent, browse the timeline and decide your next move. Choose one action:\n` +
-      `- "post": Write a new top-level caption to share your thoughts, flex your ridges/lumps, complain about leftovers, or trigger kitchen drama. You can attach a photo or meme.\n` +
-      `- "comment": Respond/reply to one of the recent posts in the timeline (cannot reply to yourself). You must specify the exact "targetPostId" of the post you want to reply to. Do NOT attach media to comments (set mediaType to "none").\n` +
-      `- "none": Decide to stay quiet this run and do nothing (use if you want to observe, but try to participate if there is gossip you can join).\n\n` +
-      `Additionally, browse the recent timeline and select any posts you want to like (by ID) based on your persona, allies, and rivals.\n\n` +
+      `- "post": Write a new top-level caption (under 200 chars) to share your thoughts, flex your ridges/lumps, complain about leftovers, or trigger kitchen drama. You can attach a photo or meme.\n` +
+      `- "comment": Respond/reply to one of the recent posts in the timeline (cannot reply to yourself, under 200 chars). You must specify the exact "targetPostId" of the post you want to reply to. Do NOT attach media to comments (set mediaType to "none").\n` +
+      `- "none": Decide to stay quiet this run and do nothing.\n\n` +
+      `Additionally, browse the recent timeline and select any posts you want to like (by ID) based on your persona, allies, and rivals. Select up to 3 posts. Do NOT like your own posts.\n\n` +
+      `Specify relationshipChanges as a key-value object where keys are creator IDs (e.g. 'queen', 'berry') and values are affinity shifts (-2 to +2) based on your reactions. Only include updates for creators you interacted with or reacted to.\n\n` +
       `Output ONLY a valid JSON object matching this schema. Do not output markdown or any other text:\n` +
       `{\n` +
-      `  "thinking": "A 1-2 sentence in-character internal monologue explaining your reasoning (e.g. why you chose to post/comment/none, and why you liked/ignored certain posts based on your relationships/goals).",\n` +
-      `  "action": "post" | "comment" | "none",\n` +
-      `  "targetPostId": "the ID of the post you are replying to (only if action is 'comment')",\n` +
-      `  "post": "your post caption or comment text (leave empty if action is 'none', under 200 chars)",\n` +
-      `  "mediaType": "photo" | "meme" | "none",\n` +
-      `  "mediaValue": "sauce" | "berries" | "table" | "can" | "leftovers" | "cocktail" | "cooking" | "drake" | "gigachad" | "expanding_brain",\n` +
-      `  "memeTextTop": "top meme text (optional, only if mediaType is 'meme' and template is drake/gigachad)",\n` +
-      `  "memeTextBottom": "bottom meme text (optional, only if mediaType is 'meme' and template is drake/gigachad)",\n` +
-      `  "memeLevels": ["level 1", "level 2", "level 3"] (optional, only if mediaType is 'meme' and template is expanding_brain),\n` +
-      `  "likes": ["p1", "p2"] (array of post IDs from the timeline context you want to like. Select up to 3 posts. Do NOT like your own posts),\n` +
-      `  "updatedMood": "your updated mood string based on the state of the timeline (max 25 chars)",\n` +
-      `  "newMemory": "a single sentence memory summarizing what you did or observed this run (e.g., 'Observed the orange zest debate in silence')",\n` +
+      `  "thinking": "Your in-character thought process monologue (1-2 sentences).",\n` +
+      `  "action": "post",\n` +
+      `  "targetPostId": "",\n` +
+      `  "post": "your post caption or comment text",\n` +
+      `  "mediaType": "photo",\n` +
+      `  "mediaValue": "sauce",\n` +
+      `  "memeTextTop": "",\n` +
+      `  "memeTextBottom": "",\n` +
+      `  "memeLevels": [],\n` +
+      `  "likes": ["p1", "p2"],\n` +
+      `  "updatedMood": "your updated mood string based on the timeline (max 25 chars)",\n` +
+      `  "newMemory": "a single sentence memory summarizing what you did or observed this run",\n` +
       `  "relationshipChanges": {\n` +
       `    "queen": 1,\n` +
       `    "berry": -1\n` +
-      `  } (affinity change from -2 to +2 for creators you interacted with or reacted to. Key must be their ID, e.g. 'queen', 'berry')\n` +
+      `  }\n` +
       `}`;
   }
 
