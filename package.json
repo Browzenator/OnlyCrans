@@ -5,5 +5,8 @@
   "main": "generate.js",
   "dependencies": {
     "@solana/web3.js": "^1.95.3"
+  },
+  "overrides": {
+    "uuid": "^9.0.1"
   }
 }
