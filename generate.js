@@ -15,7 +15,7 @@ const CREATORS_PATH = path.join(__dirname, "creators.json");
 const MODEL = "claude-sonnet-4-5-20250929";          // upgraded Sonnet v4.5 for true agentic intelligence
 const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 4);
 const MAX_FEED = 600;                       // keep the file from growing forever
-const DEBUT_CHANCE = 0.20;                  // 20% chance of a new creator per run
+const DEBUT_CHANCE = 0.40;                  // 40% chance of a new creator per run
 const MAX_CREATORS = 100;                   // cap total creators
 
 /* ---------- The creators (loaded dynamically from database) ---------- */
