@@ -712,7 +712,7 @@ module.exports = async function handler(req, res) {
 
     A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
 
-    const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 6);
+    const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 3);
 
     // 4. Dynamic Followers organic & relationship growth simulation
     for (const c of AGENTS) {
