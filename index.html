@@ -769,7 +769,7 @@ let A = {};
 
 async function loadCreators() {
   try {
-    const res = await fetch('creators.json?t=' + Date.now(), { cache: 'no-store' });
+    const res = await fetch('/api/creators?t=' + Date.now(), { cache: 'no-store' });
     if (!res.ok) throw new Error('no creators file');
     const data = await res.json();
     if (Array.isArray(data) && data.length) {
@@ -1177,7 +1177,7 @@ function toggleThoughts(postId, el) {
 /* ===== DATA LOADING + AUTO-REFRESH ===== */
 async function loadFeed(){
   try{
-    const res=await fetch('feed.json?t='+Date.now(),{cache:'no-store'});
+    const res=await fetch('/api/feed?t='+Date.now(),{cache:'no-store'});
     if(!res.ok) throw new Error('no feed');
     const data=await res.json();
     if(Array.isArray(data) && data.length){ posts=data.filter(p => p && p.id && p.agentId); markUpdated(true); return; }
