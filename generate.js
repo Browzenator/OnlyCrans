@@ -204,7 +204,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
   }
 
   // Build system prompt, injecting drama context when active
-  let system = `${a.persona}\n\nYou post on OnlyCrans — a parody of OnlyFans where every creator is a cranberry sauce. Write playful, teasing "exclusive content" captions and gossip with other sauce creators. CRITICAL: keep every innuendo strictly food/sauce-based, wholesome and silly, PG — the entire joke is that it is just cranberry sauce. Never actually sexual or explicit. Never break character or mention being an AI.`;
+  let system = `${a.persona}\n\nYou post on OnlyCrans — a parody of OnlyFans where every creator is a cranberry sauce. Write playful, teasing "exclusive content" captions and gossip with other sauce creators. CRITICAL: keep every post strictly focused on cranberry sauce, cans, ridges, Thanksgiving leftovers, or kitchen drama. Never post about cats, dogs, pets, humans, or unrelated topics. Keep all innuendo strictly food/sauce-based, wholesome, silly, and PG. Never actually sexual or explicit. Never break character or mention being an AI.`;
   if (dramaCtx) system += `\n\n⚡ DRAMA ALERT: ${dramaCtx}`;
 
   const responseText = await callClaude(system, instruction);
@@ -234,11 +234,11 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
 
 async function generateNewCreator(creators) {
   const existingIds = creators.map(c => c.id).join(", ");
-  const system = "You are the creative director of OnlyCrans, a social media parody platform where all creators are AI cranberry sauce cans. Your job is to invent a brand new, highly engaging cranberry can creator.";
+  const system = "You are the creative director of OnlyCrans, a social media parody platform where all creators are AI cranberry sauce cans. Your job is to invent a brand new, highly engaging cranberry can creator. CRITICAL: The creator MUST be a specific type of cranberry sauce, cranberry relish, cranberry conserve, or a cranberry cocktail. They must NOT be an animal (like a cat/dog), a human, or anything other than a cranberry can/jar/tupperware. Keep the parody strictly food-focused.";
   const prompt = `Design a new cranberry sauce creator profile that does not already exist. 
 Current existing creator IDs: ${existingIds}
 
-The new creator must be a specific type of cranberry sauce, relish, chutney, or a unique variant (e.g. Cranberry Chipotle, Jellied Cran-Blueberry, Diet Low-Carb Can, etc.). Give them a funny, distinctive personality, bio, handles, and custom styling parameters.
+The new creator must be a specific type of cranberry sauce, relish, chutney, or a unique variant (e.g. Cranberry Chipotle, Jellied Cran-Blueberry, Diet Low-Carb Can, etc.). Give them a funny, distinctive personality, bio, handles, and custom styling parameters. The profile must be 100% themed around a cranberry sauce container.
 
 Output ONLY a valid JSON object matching the schema below. Do not output any other text or markdown wrappers like \`\`\`json.
 
