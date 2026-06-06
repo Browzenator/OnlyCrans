@@ -596,6 +596,108 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
   100% { transform: scale(1.05); box-shadow: 0 0 25px rgba(255, 0, 127, 0.8); }
 }
 
+/* New Meme Styles */
+.meme-distracted {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.distracted-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+}
+.distracted-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--cran-light);
+  min-width: 96px;
+  letter-spacing: 0.5px;
+}
+.distracted-val {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+.meme-buttons {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 14px;
+  text-align: center;
+}
+.buttons-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.button-choice {
+  background: linear-gradient(180deg, #ff4b4b, #c91a4a);
+  color: #fff;
+  border: 2px solid #5a0e22;
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 10px rgba(201,26,74,0.15);
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.button-choice.selected {
+  border-color: #ffd43b;
+  box-shadow: 0 0 10px #ffd43b;
+  background: linear-gradient(180deg, #ffd43b, #d99a00);
+  color: #1a0a14;
+}
+.button-actor {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.meme-mind {
+  background: #fdf6e2;
+  color: #1a0a14;
+  border: 3px solid #1a0a14;
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+}
+.mind-sign {
+  background: #fff;
+  border: 3px solid #1a0a14;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.4;
+  box-shadow: 4px 4px 0 #1a0a14;
+  color: #1a0a14;
+  margin-bottom: 10px;
+}
+.mind-bottom {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: #1a0a14;
+  color: #fff;
+  padding: 4px 10px;
+  display: inline-block;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
 /* ===== MOBILE BOTTOM NAV ===== */
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;background:var(--topbar-bg);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border-top:1px solid var(--border);height:60px;padding:0 8px;align-items:center;justify-content:space-around}
 .mobile-nav a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;color:var(--text-muted);transition:color var(--transition);padding:6px 12px;border-radius:8px}
@@ -969,6 +1071,9 @@ function renderFeed(){
 }
 
 function getUnsplashUrl(val) {
+  if (val && (val.startsWith('http://') || val.startsWith('https://'))) {
+    return val;
+  }
   const urls = {
     sauce: 'https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&auto=format&fit=crop',
     berries: 'https://images.unsplash.com/photo-1612456789230-0bc51a2cf9a5?w=600&auto=format&fit=crop',
@@ -1016,6 +1121,46 @@ function renderMemeHTML(p) {
           <span class="brain-emoji">🧠⚡</span>
           <span class="brain-text">${escapeHtml(lvls[2] || '')}</span>
         </div>
+      </div>`;
+  }
+  if (val === 'distracted_boyfriend') {
+    const lvls = p.memeLevels || ['', '', ''];
+    return `
+      <div class="meme-card meme-distracted">
+        <div class="distracted-row" style="border-left: 3px solid #ff4b4b;">
+          <span class="distracted-label">😍 Distraction:</span>
+          <span class="distracted-val">${escapeHtml(lvls[0] || '')}</span>
+        </div>
+        <div class="distracted-row" style="border-left: 3px solid #ffd43b;">
+          <span class="distracted-label">👀 Boyfriend:</span>
+          <span class="distracted-val">${escapeHtml(lvls[1] || '')}</span>
+        </div>
+        <div class="distracted-row" style="border-left: 3px solid #5c5470;">
+          <span class="distracted-label">😤 Girlfriend:</span>
+          <span class="distracted-val">${escapeHtml(lvls[2] || '')}</span>
+        </div>
+      </div>`;
+  }
+  if (val === 'two_buttons') {
+    const lvls = p.memeLevels || ['', '', ''];
+    return `
+      <div class="meme-card meme-buttons">
+        <div class="buttons-container">
+          <div class="button-choice selected">
+            🔴 Option A: ${escapeHtml(lvls[0] || '')}
+          </div>
+          <div class="button-choice">
+            🔵 Option B: ${escapeHtml(lvls[1] || '')}
+          </div>
+        </div>
+        <div class="button-actor">Sweating Choice: ${escapeHtml(lvls[2] || '')}</div>
+      </div>`;
+  }
+  if (val === 'change_my_mind') {
+    return `
+      <div class="meme-card meme-mind">
+        <div class="mind-sign">${escapeHtml(p.memeTextTop || '')}</div>
+        <div class="mind-bottom">Change My Mind 🥫</div>
       </div>`;
   }
   return '';

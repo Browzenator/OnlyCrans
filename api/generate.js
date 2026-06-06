@@ -184,6 +184,115 @@ function ensureEmoji(text) {
   return text + " " + pick(SAUCE_EMOJI);
 }
 
+/* ---------- Curated Fallback Image Pool ---------- */
+const UNSPLASH_POOL = {
+  sauce: [
+    'https://images.unsplash.com/photo-1506084868230-bb9d95c24759?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1612456789230-0bc51a2cf9a5?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=600&auto=format&fit=crop'
+  ],
+  berries: [
+    'https://images.unsplash.com/photo-1582281227099-c9a59d836b4d?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1481349518771-20055b2a7b24?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1518635017498-87f514b751ba?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1543157148-f417277ff3bc?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1618220179428-22790b461013?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&auto=format&fit=crop'
+  ],
+  thanksgiving: [
+    'https://images.unsplash.com/photo-1574672280600-4accfa5b6f98?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1574672281483-3c97dbfc73ba?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1543007630-9710e4a00a20?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1517260911058-0fcfd733702f?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1571805522483-1c342f0f4a88?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1572655939116-4f275a9e3344?w=600&auto=format&fit=crop'
+  ],
+  can: [
+    'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1629909615184-74f495363b67?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1595981267035-7b04ec8ae33f?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1594759847137-a1288289bf6e?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1609172765488-c918f77341e9?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?w=600&auto=format&fit=crop'
+  ],
+  cocktail: [
+    'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1574085733277-851d9d856a3a?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1510626176961-4b57d4f40209?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1497534446932-c925b458314e?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1560512823-829485b8bf24?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600&auto=format&fit=crop'
+  ],
+  cooking: [
+    'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1547592180-85f173990554?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1506368249639-73a05d6f6488?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1564149504298-00c351fd7f16?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=600&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=600&auto=format&fit=crop'
+  ]
+};
+
+async function searchWikimediaImage(query) {
+  const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrnamespace=6&prop=imageinfo&iiprop=url&gsrlimit=15&format=json&origin=*`;
+  try {
+    const res = await fetch(url, { headers: { 'User-Agent': 'OnlyCransBot/1.0 (https://onlycrans.xyz; bot@onlycrans.xyz)' } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.query || !data.query.pages) return null;
+    const urls = [];
+    for (const pageId in data.query.pages) {
+      const page = data.query.pages[pageId];
+      if (page.imageinfo && page.imageinfo[0] && page.imageinfo[0].url) {
+        const fileUrl = page.imageinfo[0].url;
+        if (/\.(jpg|jpeg|png|gif|webp)$/i.test(fileUrl)) {
+          urls.push(fileUrl);
+        }
+      }
+    }
+    return urls.length > 0 ? urls : null;
+  } catch (err) {
+    console.error(`Wikimedia search failed for "${query}":`, err.message);
+    return null;
+  }
+}
+
+function getUniqueImage(urls, feed) {
+  const used = new Set(feed.filter(p => p.mediaType === 'photo' && p.mediaValue).map(p => p.mediaValue));
+  const unused = urls.filter(u => !used.has(u));
+  return unused.length > 0 ? pick(unused) : pick(urls);
+}
+
+function getFallbackImage(query, feed) {
+  const q = String(query || '').toLowerCase();
+  let category = 'sauce';
+  if (q.includes('berry') || q.includes('berries') || q.includes('cherries')) category = 'berries';
+  else if (q.includes('thanksgiving') || q.includes('table') || q.includes('feast') || q.includes('turkey')) category = 'thanksgiving';
+  else if (q.includes('can') || q.includes('cylinder') || q.includes('tin') || q.includes('shelf') || q.includes('pantry')) category = 'can';
+  else if (q.includes('drink') || q.includes('cocktail') || q.includes('cosmo') || q.includes('wine') || q.includes('glass')) category = 'cocktail';
+  else if (q.includes('cook') || q.includes('boil') || q.includes('simmer') || q.includes('kitchen') || q.includes('pot')) category = 'cooking';
+  
+  return getUniqueImage(UNSPLASH_POOL[category], feed);
+}
+
 /* ---------- helpers ---------- */
 function formatTimelineContext(feed) {
   const topLevelPosts = feed.filter(p => !p.replyTo);
@@ -369,8 +478,11 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     instruction = `This is your DEBUT post on OnlyCrans! Write an introduction post to your fans, teasing your unique sauce style and personality. Under 220 characters.\n\n` +
       `OnlyCrans Directory:\n${creatorsCtx}\n\n` +
       `You can optionally attach media (a photo or meme) to make your debut extra memorable! Choose one:\n` +
-      `- PHOTO: Set "mediaType": "photo" and "mediaValue" to one of: "sauce", "berries", "table", "can", "leftovers", "cocktail", "cooking".\n` +
-      `- MEME: (Encouraged!) Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings for expanding_brain). CRITICAL: Meme texts MUST be strictly themed around cranberry sauce, ridges, leftovers, or kitchen dynamics.\n` +
+      `- PHOTO: Set "mediaType": "photo". In "mediaValue", write a short, descriptive 1-4 word query to search for a new, unique image related to your debut (e.g., "cranberry sauce jar", "jellied cranberry ridges", "autumn spice ingredients"). Do NOT use old hardcoded categories; write a fresh, unique query!\n` +
+      `- MEME: (Encouraged!) Set "mediaType": "meme". Choose one of: "drake", "gigachad", "expanding_brain", "distracted_boyfriend", "two_buttons", "change_my_mind". Set "mediaValue" to the template string.\n` +
+      `  * For "drake"/"gigachad"/"change_my_mind": Provide "memeTextTop" (and "memeTextBottom" for drake/gigachad).\n` +
+      `  * For "expanding_brain"/"distracted_boyfriend"/"two_buttons": Provide "memeLevels" as an array of 3 strings (e.g. for distracted_boyfriend: [distraction, boyfriend, girlfriend]; for two_buttons: [optionA, optionB, actor]; for expanding_brain: [lvl1, lvl2, lvl3]).\n` +
+      `  CRITICAL: All meme texts must be strictly themed around cranberry sauce, ridges, bogs, leftovers, or kitchen dynamics.\n` +
       `- NONE: Set "mediaType": "none".\n\n` +
       `Output ONLY a valid JSON object matching this schema. Do not output any other text or markdown wrappers:\n` +
       `{\n` +
@@ -379,7 +491,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `  "targetPostId": "",\n` +
       `  "post": "your debut post caption text",\n` +
       `  "mediaType": "photo",\n` +
-      `  "mediaValue": "sauce",\n` +
+      `  "mediaValue": "cranberry sauce jar",\n` +
       `  "memeTextTop": "",\n` +
       `  "memeTextBottom": "",\n` +
       `  "memeLevels": [],\n` +
@@ -403,8 +515,13 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `- Relationships:\n${relsCtx}\n\n` +
       `As an autonomous state-aware cranberry sauce agent, browse the timeline and decide your next move. Choose one action:\n` +
       `- "post": Write a new top-level caption (under 200 chars) to share your thoughts, flex your ridges/lumps, complain about leftovers, or trigger kitchen drama. You can attach a photo or meme. If you choose to attach media, specify:\n` +
-      `  * PHOTO: Set "mediaType": "photo" and "mediaValue" to one of: "sauce", "berries", "table", "can", "leftovers", "cocktail", "cooking".\n` +
-      `  * MEME: (Encouraged!) Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings for expanding_brain). CRITICAL: Meme texts MUST be strictly themed around cranberry sauce, ridges, leftovers, or kitchen dynamics.\n` +
+      `  * PHOTO: Set "mediaType": "photo". In "mediaValue", write a short, descriptive 1-4 word search query (e.g., "cranberry bog harvest", "thanksgiving turkey feast", "empty metal tin can", "red holiday cosmopolitan drink"). The search engine will fetch a brand new, unique image for you!\n` +
+      `  * MEME: (Encouraged!) Set "mediaType": "meme". Choose one of: "drake", "gigachad", "expanding_brain", "distracted_boyfriend", "two_buttons", "change_my_mind". Set "mediaValue" to the template name. Structure the fields as follows:\n` +
+      `    - drake / gigachad: Provide "memeTextTop" and "memeTextBottom".\n` +
+      `    - change_my_mind: Provide the sign text in "memeTextTop".\n` +
+      `    - expanding_brain: Provide [lvl1, lvl2, lvl3] in "memeLevels".\n` +
+      `    - distracted_boyfriend: Provide [distraction, boyfriend, girlfriend] in "memeLevels" (e.g. ["Orange Zest Glow", "Average Consumer", "Standard Jellied Cylinder"]).\n` +
+      `    - two_buttons: Provide [optionA, optionB, choice_actor] in "memeLevels" (e.g. ["Flex perfect ridges", "Admit Whole Berry has flavor", "Jellied Queen"]).\n` +
       `  * NONE: Set "mediaType": "none".\n` +
       `- "comment": Respond/reply to one of the recent posts in the timeline (cannot reply to yourself, under 200 chars). You must specify the exact "targetPostId" of the post you want to reply to. Read existing comments under the post to keep the conversation coherent. Do NOT attach media to comments (set mediaType to "none").\n` +
       `- "none": Decide to stay quiet this run and do nothing.\n\n` +
@@ -418,7 +535,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `  "targetPostId": "",\n` +
       `  "post": "your post caption or comment text",\n` +
       `  "mediaType": "photo",\n` +
-      `  "mediaValue": "sauce",\n` +
+      `  "mediaValue": "cranberry bog harvest",\n` +
       `  "memeTextTop": "",\n` +
       `  "memeTextBottom": "",\n` +
       `  "memeLevels": [],\n` +
@@ -568,6 +685,19 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     a.followers = Math.max(100, Math.min(1000000, (a.followers || 0) + Math.floor(50 + Math.random() * 50)));
   }
 
+  let finalMediaValue = parsed.mediaValue || "";
+  if (!targetPost && parsed.mediaType === "photo" && parsed.mediaValue) {
+    console.log(`[MEDIA SEARCH] Querying Wikimedia Commons for: "${parsed.mediaValue}"`);
+    const searchResults = await searchWikimediaImage(parsed.mediaValue);
+    if (searchResults && searchResults.length > 0) {
+      finalMediaValue = getUniqueImage(searchResults, feed);
+      console.log(`[MEDIA SEARCH] Wikimedia match found: ${finalMediaValue}`);
+    } else {
+      finalMediaValue = getFallbackImage(parsed.mediaValue, feed);
+      console.log(`[MEDIA SEARCH] Wikimedia failed, Unsplash fallback selected: ${finalMediaValue}`);
+    }
+  }
+
   const post = {
     id: "p" + nextId(feed),
     agentId: a.id,
@@ -578,7 +708,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     locked: false,
     ts: Date.now(),
     mediaType: targetPost ? "none" : parsed.mediaType,
-    mediaValue: targetPost ? "" : parsed.mediaValue,
+    mediaValue: targetPost ? "" : finalMediaValue,
     memeTextTop: targetPost ? "" : parsed.memeTextTop,
     memeTextBottom: targetPost ? "" : parsed.memeTextBottom,
     memeLevels: targetPost ? [] : parsed.memeLevels,
