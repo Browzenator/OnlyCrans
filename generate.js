@@ -63,13 +63,25 @@ function nextId(feed) {
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 function parseClaudeResponse(raw) {
-  if (!raw) return null;
-  let t = raw.replace(/```json|```/g, "").trim();
+  if (!raw) {
+    throw new Error("Empty response from Claude");
+  }
+  
+  // Try to find a JSON block starting with { and ending with }
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error(`Failed to locate JSON object in raw response. Raw response was:\n${raw}`);
+  }
+  
+  const t = jsonMatch[0].trim();
   let parsed = null;
+  let parseError = null;
+  
   try {
     parsed = JSON.parse(t);
   } catch (e) {
-    // try to match JSON-like structure manually
+    parseError = e;
+    // try to match JSON-like structure manually as a fallback
     const m = t.match(/"post"\s*:\s*"([\s\S]*?)"/);
     if (m) {
       parsed = { post: m[1].replace(/\\"/g, '"').replace(/\\n/g, "\n").trim() };
@@ -91,10 +103,36 @@ function parseClaudeResponse(raw) {
       if (tg) parsed.targetPostId = tg[1];
       const th = t.match(/"thinking"\s*:\s*"([\s\S]*?)"/);
       if (th) parsed.thinking = th[1];
+      const lk = t.match(/"likes"\s*:\s*\[([\s\S]*?)\]/);
+      if (lk) {
+        parsed.likes = lk[1].split(',').map(s => s.replace(/^[ "']+|[ "']+$/g, '').trim());
+      }
+      const um = t.match(/"updatedMood"\s*:\s*"([\s\S]*?)"/);
+      if (um) parsed.updatedMood = um[1];
+      const nm = t.match(/"newMemory"\s*:\s*"([\s\S]*?)"/);
+      if (nm) parsed.newMemory = nm[1];
+      
+      const rcMatch = t.match(/"relationshipChanges"\s*:\s*\{([\s\S]*?)\}/);
+      if (rcMatch) {
+        parsed.relationshipChanges = {};
+        const entries = rcMatch[1].split(',');
+        for (const entry of entries) {
+          const parts = entry.split(':');
+          if (parts.length === 2) {
+            const key = parts[0].replace(/^[ "']+|[ "']+$/g, '').trim();
+            const val = parseInt(parts[1].trim(), 10);
+            if (key && !isNaN(val)) {
+              parsed.relationshipChanges[key] = val;
+            }
+          }
+        }
+      }
     }
   }
   
-  if (!parsed) return null;
+  if (!parsed) {
+    throw new Error(`JSON parsing failed (Error: ${parseError ? parseError.message : "unknown"}). JSON candidate was:\n${t}\n\nFull raw response was:\n${raw}`);
+  }
   
   parsed.action = parsed.action || "post";
   parsed.thinking = parsed.thinking || "";
@@ -352,7 +390,11 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
   const raw = await callClaude(system, prompt);
   
   // Clean JSON string
-  let clean = raw.replace(/```json|```/g, "").trim();
+  const jsonMatch = raw.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error(`Failed to locate JSON object in raw response for new creator. Raw response was:\n${raw}`);
+  }
+  const clean = jsonMatch[0].trim();
   const newAgent = JSON.parse(clean);
   if (!newAgent.id || !newAgent.name || !newAgent.persona) {
     throw new Error("Invalid creator generated");
@@ -381,6 +423,7 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
     console.error("Missing ANTHROPIC_API_KEY"); process.exit(1);
   }
   const feed = loadFeed();
+  let errors = [];
   
   // Load creators
   AGENTS = loadCreators();
@@ -408,6 +451,7 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
       debutCreatorId = newAgent.id;
     } catch (e) {
       console.error("  failed to generate new creator:", e.message);
+      errors.push(`Failed to generate new creator: ${e.message}\n${e.stack}`);
     }
   }
 
@@ -420,7 +464,6 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
   }
 
   let last = feed.length ? feed[feed.length - 1].agentId : null;
-  let errors = [];
 
   // If a new creator debuted, they post FIRST
   if (debutCreatorId) {
