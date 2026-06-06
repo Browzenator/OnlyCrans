@@ -10,21 +10,38 @@ const kvUrl = process.env.KV_REST_API_URL;
 const kvToken = process.env.KV_REST_API_TOKEN;
 
 /* ---------- Surrogate Sanitization Helpers ---------- */
-function sanitizeSurrogates(str) {
+function cleanString(str) {
   if (typeof str !== 'string') return str;
-  return str.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(^|[^\uD800-\uDBFF])[\uDC00-\uDFFF]/g, "$1");
+  let result = "";
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    if (code >= 0xD800 && code <= 0xDBFF) {
+      if (i + 1 < str.length) {
+        const nextCode = str.charCodeAt(i + 1);
+        if (nextCode >= 0xDC00 && nextCode <= 0xDFFF) {
+          result += str[i] + str[i+1];
+          i++;
+        }
+      }
+    } else if (code >= 0xDC00 && code <= 0xDFFF) {
+      // Skip unpaired low surrogate
+    } else {
+      result += str[i];
+    }
+  }
+  return result;
 }
 
-function sanitizeObject(obj) {
+function cleanObject(obj) {
   if (typeof obj === 'string') {
-    return sanitizeSurrogates(obj);
+    return cleanString(obj);
   }
   if (Array.isArray(obj)) {
-    return obj.map(sanitizeObject);
+    return obj.map(cleanObject);
   }
   if (obj && typeof obj === 'object') {
     for (const key of Object.keys(obj)) {
-      obj[key] = sanitizeObject(obj[key]);
+      obj[key] = cleanObject(obj[key]);
     }
   }
   return obj;
@@ -49,10 +66,10 @@ async function loadFeedFromKV() {
   });
   const data = await res.json();
   if (data.result) {
-    return sanitizeObject(JSON.parse(data.result));
+    return cleanObject(JSON.parse(data.result));
   }
   const localPath = path.join(process.cwd(), 'feed.json');
-  return fs.existsSync(localPath) ? sanitizeObject(JSON.parse(fs.readFileSync(localPath, 'utf8'))) : [];
+  return fs.existsSync(localPath) ? cleanObject(JSON.parse(fs.readFileSync(localPath, 'utf8'))) : [];
 }
 
 async function saveFeedToKV(feed) {
@@ -71,10 +88,10 @@ async function loadCreatorsFromKV() {
   });
   const data = await res.json();
   if (data.result) {
-    return sanitizeObject(JSON.parse(data.result));
+    return cleanObject(JSON.parse(data.result));
   }
   const localPath = path.join(process.cwd(), 'creators.json');
-  return fs.existsSync(localPath) ? sanitizeObject(JSON.parse(fs.readFileSync(localPath, 'utf8'))) : [];
+  return fs.existsSync(localPath) ? cleanObject(JSON.parse(fs.readFileSync(localPath, 'utf8'))) : [];
 }
 
 async function saveCreatorsToKV(creators) {
@@ -190,6 +207,8 @@ function parseClaudeResponse(raw) {
 }
 
 async function callClaude(system, userText) {
+  const cleanSystem = cleanString(system);
+  const cleanUserText = cleanString(userText);
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -200,8 +219,8 @@ async function callClaude(system, userText) {
     body: JSON.stringify({
       model: MODEL,
       max_tokens: 1000,
-      system,
-      messages: [{ role: "user", content: userText }],
+      system: cleanSystem,
+      messages: [{ role: "user", content: cleanUserText }],
     }),
   });
   if (!res.ok) throw new Error(`API ${res.status}: ${await res.text()}`);
