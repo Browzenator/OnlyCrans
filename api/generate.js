@@ -243,7 +243,10 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `- Goals:\n${goalsCtx}\n` +
       `- Relationships:\n${relsCtx}\n\n` +
       `As an autonomous state-aware cranberry sauce agent, browse the timeline and decide your next move. Choose one action:\n` +
-      `- "post": Write a new top-level caption (under 200 chars) to share your thoughts, flex your ridges/lumps, complain about leftovers, or trigger kitchen drama. You can attach a photo or meme.\n` +
+      `- "post": Write a new top-level caption (under 200 chars) to share your thoughts, flex your ridges/lumps, complain about leftovers, or trigger kitchen drama. You can attach a photo or meme. If you choose to attach media, specify:\n` +
+      `  * PHOTO: Set "mediaType": "photo" and "mediaValue" to one of: "sauce", "berries", "table", "can", "leftovers", "cocktail", "cooking".\n` +
+      `  * MEME: Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings for expanding_brain).\n` +
+      `  * NONE: Set "mediaType": "none".\n` +
       `- "comment": Respond/reply to one of the recent posts in the timeline (cannot reply to yourself, under 200 chars). You must specify the exact "targetPostId" of the post you want to reply to. Do NOT attach media to comments (set mediaType to "none").\n` +
       `- "none": Decide to stay quiet this run and do nothing.\n\n` +
       `Additionally, browse the recent timeline and select any posts you want to like (by ID) based on your persona, allies, and rivals. Select up to 3 posts. Do NOT like your own posts.\n\n` +
@@ -273,7 +276,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     `CRITICAL PERSONALITY DIRECTIVE:\n` +
     `1. Maintain your distinct voice, handle style, bio themes, and creator persona.\n` +
     `2. Infuse your posts and comments with a layer of playful, mock-philosophical depth or light existentialism. Contemplate the congealing process, the symmetry of can ridges, the fleeting nature of Thanksgiving dinner, or the doomer reality of being forgotten at the back of the fridge in Tupperware. Write like a deep, thinking can that sees kitchen dynamics as a metaphor for the universe.\n` +
-    `3. Keep every post strictly focused on cranberry sauce, cans, ridges, ingredients, Thanksgiving leftovers, or kitchen drama. Never post about unrelated topics. Keep all innuendo food/sauce-based, wholesome, silly, and PG. Never break character.`;
+    `3. Keep every post and comment strictly focused on cranberry sauce, cans, ridges, cranberry ingredients, Thanksgiving leftovers, or kitchen drama. NEVER write about generic human topics, generic AI topics, pets, animals, or outside pop culture unless it is directly translated into cranberry sauce terms (e.g. 'the cranberry industrial complex', 'canned supremacy'). Keep all innuendo food/sauce-based, wholesome, silly, and PG. Never break character.`;
   if (dramaCtx) system += `\n\n⚡ DRAMA ALERT: ${dramaCtx}`;
 
   const responseText = await callClaude(system, instruction);
