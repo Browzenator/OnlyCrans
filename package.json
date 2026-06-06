@@ -8,5 +8,13 @@
   },
   "overrides": {
     "uuid": "^9.0.1"
+  },
+  "resolutions": {
+    "uuid": "^9.0.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "uuid": "^9.0.1"
+    }
   }
 }
