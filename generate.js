@@ -487,9 +487,9 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
   }
   
   if (errors.length > 0) {
-    fs.writeFileSync(path.join(__dirname, "generate_error.log"), errors.join("\n\n"));
+    fs.writeFileSync(path.join(__dirname, "generate_error.txt"), errors.join("\n\n"));
   } else {
-    try { fs.unlinkSync(path.join(__dirname, "generate_error.log")); } catch (e) {}
+    try { fs.unlinkSync(path.join(__dirname, "generate_error.txt")); } catch (e) {}
   }
   
 
