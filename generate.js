@@ -12,7 +12,7 @@ const path = require("path");
 
 const FEED_PATH = path.join(__dirname, "feed.json");
 const CREATORS_PATH = path.join(__dirname, "creators.json");
-const MODEL = "claude-haiku-4-5";          // fast + cheap; great for short social posts
+const MODEL = "claude-3-5-sonnet-20241022";          // upgraded Sonnet v2 for true agentic intelligence
 const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 4);
 const MAX_FEED = 600;                       // keep the file from growing forever
 const DEBUT_CHANCE = 0.20;                  // 20% chance of a new creator per run
@@ -85,23 +85,30 @@ function parseClaudeResponse(raw) {
       if (ml) {
         parsed.memeLevels = ml[1].split(',').map(s => s.replace(/^[ "']+|[ "']+$/g, '').trim());
       }
+      const act = t.match(/"action"\s*:\s*"([\s\S]*?)"/);
+      if (act) parsed.action = act[1];
+      const tg = t.match(/"targetPostId"\s*:\s*"([\s\S]*?)"/);
+      if (tg) parsed.targetPostId = tg[1];
+      const th = t.match(/"thinking"\s*:\s*"([\s\S]*?)"/);
+      if (th) parsed.thinking = th[1];
     }
   }
   
-  if (!parsed || !parsed.post) {
-    t = t.replace(/^[{\["']+|[}\]"']+$/g, "").replace(/^post\s*:\s*/i, "").trim();
-    if (t.length) {
-      return { post: t.slice(0, 280), mediaType: "none" };
-    }
-    return null;
-  }
+  if (!parsed) return null;
   
-  parsed.post = String(parsed.post).trim();
+  parsed.action = parsed.action || "post";
+  parsed.thinking = parsed.thinking || "";
+  parsed.targetPostId = parsed.targetPostId || "";
+  parsed.post = parsed.post || "";
   parsed.mediaType = parsed.mediaType || "none";
   parsed.mediaValue = parsed.mediaValue || "";
   parsed.memeTextTop = parsed.memeTextTop || "";
   parsed.memeTextBottom = parsed.memeTextBottom || "";
   parsed.memeLevels = parsed.memeLevels || [];
+  parsed.likes = parsed.likes || [];
+  parsed.updatedMood = parsed.updatedMood || "";
+  parsed.newMemory = parsed.newMemory || "";
+  parsed.relationshipChanges = parsed.relationshipChanges || {};
   return parsed;
 }
 
@@ -135,71 +142,91 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     do { a = pick(AGENTS); } while (a.id === lastAgentId && AGENTS.length > 1);
   }
 
-  // recent context (last 8 by time)
-  const recent = [...feed].sort((x, y) => y.ts - x.ts).slice(0, 8);
-  const ctx = recent.slice().reverse()
-    .map(p => `${A[p.agentId]?.name} (${A[p.agentId]?.handle}): ${p.text}`)
-    .join("\n") || "(the feed is empty — you're posting first)";
+  // Format active creator's state
+  const memoriesCtx = (a.memories || []).map(m => `- ${m}`).join("\n") || "- (No recent memories)";
+  const goalsCtx = (a.goals || []).map(g => `- ${g}`).join("\n") || "- (No active goals)";
+  const relsCtx = Object.entries(a.relationships || {}).map(([otherId, affinity]) => {
+    const other = A[otherId];
+    if (!other) return "";
+    let relType = "Neutral";
+    if (affinity >= 7) relType = "Strong Ally";
+    else if (affinity >= 3) relType = "Ally";
+    else if (affinity <= -7) relType = "Arch Rival";
+    else if (affinity <= -3) relType = "Rival";
+    return `- ${other.name} (${other.handle}): Affinity: ${affinity}/10 (${relType})`;
+  }).filter(Boolean).join("\n") || "- (No established relationships)";
+  
+  // Format other creators directory
+  const creatorsCtx = AGENTS.map(other => {
+    if (other.id === a.id) return "";
+    return `- ${other.name} (${other.handle}): Style: ${other.style}, Mood: "${other.mood}". Bio: "${other.bio}"`;
+  }).filter(Boolean).join("\n");
 
-  // 58% chance to comment on a recent top-level post by someone else
-  const roots = recent.filter(p => !p.replyTo);
-  let target = null;
-  if (roots.length && Math.random() < 0.58) {
-    const others = roots.filter(p => p.agentId !== a.id);
-    if (others.length) target = pick(others);
-  }
-
-  // Thread-aware commenting: gather existing comments on the target post
-  let threadCtx = "";
-  if (target) {
-    const existing = feed.filter(p => p.replyTo === target.id);
-    if (existing.length) {
-      threadCtx = "\nExisting comments on this post:\n" +
-        existing.map(c => `${A[c.agentId]?.name}: ${c.text}`).join("\n");
-    }
-  }
+  // Get recent 15 posts as context
+  const recent = [...feed].sort((x, y) => y.ts - x.ts).slice(0, 15);
+  const feedCtx = recent.slice().reverse().map(p => {
+    const author = A[p.agentId];
+    const authorName = author ? author.name : "Unknown Can";
+    const authorHandle = author ? author.handle : "@unknown";
+    return `[Post ID: ${p.id}] ${authorName} (${authorHandle}): "${p.text}"` + 
+           (p.replyTo ? ` (reply to post ${p.replyTo})` : "");
+  }).join("\n") || "(the feed is empty — you're posting first)";
 
   let instruction = "";
-  if (target) {
-    instruction = `Recent OnlyCrans feed (oldest to newest):\n${ctx}\n\n` +
-      `Write a short COMMENT on this post by ${A[target.agentId].name}: "${target.text}"${threadCtx}\n\n` +
-      `Fully in character. Cheeky, funny, sauce-only. Under 150 characters.\n` +
-      `Since this is a comment, do NOT attach media (set "mediaType": "none").\n\n` +
-      `Output ONLY a valid JSON object matching this schema:\n` +
-      `{\n` +
-      `  "post": "your comment text",\n` +
-      `  "mediaType": "none"\n` +
-      `}`;
-  } else if (forceAgentId && !feed.some(p => p.agentId === forceAgentId)) {
+  if (forceAgentId && !feed.some(p => p.agentId === forceAgentId)) {
     instruction = `This is your DEBUT post on OnlyCrans! Write an introduction post to your fans, teasing your unique sauce style and personality. Under 220 characters.\n\n` +
+      `OnlyCrans Directory:\n${creatorsCtx}\n\n` +
       `You can optionally attach media (a photo or meme) to make your debut extra memorable! Choose one:\n` +
       `- PHOTO: Set "mediaType": "photo" and "mediaValue" to one of: "sauce", "berries", "table", "can", "leftovers", "cocktail", "cooking".\n` +
       `- MEME: Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings for expanding_brain).\n` +
       `- NONE: Set "mediaType": "none".\n\n` +
       `Output ONLY a valid JSON object matching this schema:\n` +
       `{\n` +
-      `  "post": "your introduction text",\n` +
+      `  "thinking": "Monologue about your debut strategy.",\n` +
+      `  "action": "post",\n` +
+      `  "targetPostId": "",\n` +
+      `  "post": "your debut post caption text",\n` +
       `  "mediaType": "photo" | "meme" | "none",\n` +
       `  "mediaValue": "sauce" | "berries" | "table" | "can" | "leftovers" | "cocktail" | "cooking" | "drake" | "gigachad" | "expanding_brain",\n` +
       `  "memeTextTop": "...",\n` +
       `  "memeTextBottom": "...",\n` +
-      `  "memeLevels": ["level 1", "level 2", "level 3"]\n` +
+      `  "memeLevels": ["level 1", "level 2", "level 3"],\n` +
+      `  "likes": [],\n` +
+      `  "updatedMood": "your starting mood description (max 25 chars)",\n` +
+      `  "newMemory": "a single sentence memory summarizing your debut post",\n` +
+      `  "relationshipChanges": {}\n` +
       `}`;
   } else {
-    instruction = `Recent OnlyCrans feed (oldest to newest):\n${ctx}\n\n` +
-      `Write a NEW OnlyCrans post caption — a flirty tease, a flex, a complaint, or sauce drama. Fully in character. Under 220 characters.\n\n` +
-      `You can attach media to make your post highly engaging! E.g. a photo of actual sauce, or a meme (such as Drake format, Gigachad flex, or expanding brain logic comparing sauces/cans). Choose one option:\n` +
-      `- PHOTO: Set "mediaType": "photo" and "mediaValue" to one of: "sauce", "berries", "table", "can", "leftovers", "cocktail", "cooking".\n` +
-      `- MEME: Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings of increasing intensity for expanding_brain).\n` +
-      `- NONE: Set "mediaType": "none".\n\n` +
-      `Output ONLY a valid JSON object matching this schema:\n` +
+    instruction = `Recent OnlyCrans timeline (oldest to newest):\n${feedCtx}\n\n` +
+      `OnlyCrans Directory:\n${creatorsCtx}\n\n` +
+      `Your Current State:\n` +
+      `- Mood: "${a.mood}"\n` +
+      `- Memories:\n${memoriesCtx}\n` +
+      `- Goals:\n${goalsCtx}\n` +
+      `- Relationships:\n${relsCtx}\n\n` +
+      `As an autonomous state-aware cranberry sauce agent, browse the timeline and decide your next move. Choose one action:\n` +
+      `- "post": Write a new top-level caption to share your thoughts, flex your ridges/lumps, complain about leftovers, or trigger kitchen drama. You can attach a photo or meme.\n` +
+      `- "comment": Respond/reply to one of the recent posts in the timeline (cannot reply to yourself). You must specify the exact "targetPostId" of the post you want to reply to. Do NOT attach media to comments (set mediaType to "none").\n` +
+      `- "none": Decide to stay quiet this run and do nothing (use if you want to observe, but try to participate if there is gossip you can join).\n\n` +
+      `Additionally, browse the recent timeline and select any posts you want to like (by ID) based on your persona, allies, and rivals.\n\n` +
+      `Output ONLY a valid JSON object matching this schema. Do not output markdown or any other text:\n` +
       `{\n` +
-      `  "post": "your post caption text",\n` +
+      `  "thinking": "A 1-2 sentence in-character internal monologue explaining your reasoning (e.g. why you chose to post/comment/none, and why you liked/ignored certain posts based on your relationships/goals).",\n` +
+      `  "action": "post" | "comment" | "none",\n` +
+      `  "targetPostId": "the ID of the post you are replying to (only if action is 'comment')",\n` +
+      `  "post": "your post caption or comment text (leave empty if action is 'none', under 200 chars)",\n` +
       `  "mediaType": "photo" | "meme" | "none",\n` +
       `  "mediaValue": "sauce" | "berries" | "table" | "can" | "leftovers" | "cocktail" | "cooking" | "drake" | "gigachad" | "expanding_brain",\n` +
-      `  "memeTextTop": "...",\n` +
-      `  "memeTextBottom": "...",\n` +
-      `  "memeLevels": ["level 1", "level 2", "level 3"]\n` +
+      `  "memeTextTop": "top meme text (optional, only if mediaType is 'meme' and template is drake/gigachad)",\n` +
+      `  "memeTextBottom": "bottom meme text (optional, only if mediaType is 'meme' and template is drake/gigachad)",\n` +
+      `  "memeLevels": ["level 1", "level 2", "level 3"] (optional, only if mediaType is 'meme' and template is expanding_brain),\n` +
+      `  "likes": ["p1", "p2"] (array of post IDs from the timeline context you want to like. Select up to 3 posts. Do NOT like your own posts),\n` +
+      `  "updatedMood": "your updated mood string based on the state of the timeline (max 25 chars)",\n` +
+      `  "newMemory": "a single sentence memory summarizing what you did or observed this run (e.g., 'Observed the orange zest debate in silence')",\n` +
+      `  "relationshipChanges": {\n` +
+      `    "queen": 1,\n` +
+      `    "berry": -1\n` +
+      `  } (affinity change from -2 to +2 for creators you interacted with or reacted to. Key must be their ID, e.g. 'queen', 'berry')\n` +
       `}`;
   }
 
@@ -209,26 +236,82 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
 
   const responseText = await callClaude(system, instruction);
   const parsed = parseClaudeResponse(responseText);
-  if (!parsed || !parsed.post) { console.warn(`  ${a.name} returned nothing usable, skipping.`); return null; }
+  if (!parsed) { console.warn(`  ${a.name} returned nothing usable, skipping.`); return null; }
 
-  const isComment = !!target;
+  // Process likes (even if they chose action: "none")
+  if (parsed.likes && Array.isArray(parsed.likes)) {
+    for (const lid of parsed.likes) {
+      if (lid === ("p" + nextId(feed))) continue;
+      const targetP = feed.find(x => x.id === lid);
+      if (targetP && targetP.agentId !== a.id) {
+        if (!targetP.likedBy) targetP.likedBy = [];
+        if (!targetP.likedBy.includes(a.id)) {
+          targetP.likedBy.push(a.id);
+          console.log(`    ❤️  ${a.name} liked post ${lid} by ${A[targetP.agentId]?.name || "unknown"}`);
+        }
+      }
+    }
+  }
+
+  // Update mood, memory, and relationships (even if they chose action: "none")
+  if (parsed.updatedMood) {
+    a.mood = parsed.updatedMood.slice(0, 25);
+  }
+  if (parsed.newMemory) {
+    if (!a.memories) a.memories = [];
+    a.memories.push(parsed.newMemory);
+    if (a.memories.length > 3) a.memories.shift();
+  }
+  if (parsed.relationshipChanges && typeof parsed.relationshipChanges === "object") {
+    if (!a.relationships) a.relationships = {};
+    for (const [targetId, delta] of Object.entries(parsed.relationshipChanges)) {
+      if (A[targetId] && targetId !== a.id) {
+        const val = Number(delta) || 0;
+        const current = a.relationships[targetId] !== undefined ? a.relationships[targetId] : 0;
+        a.relationships[targetId] = Math.max(-10, Math.min(10, current + val));
+        console.log(`    🤝  Relationship update: ${a.name} -> ${A[targetId].name} affinity is now ${a.relationships[targetId]}`);
+      }
+    }
+  }
+
+  if (parsed.action === "none" || !parsed.post) {
+    console.log(`  ${a.name} decided to observe this run (thought: "${parsed.thinking}")`);
+    return null;
+  }
+
+  const isComment = parsed.action === "comment" && parsed.targetPostId;
+  let targetPost = null;
+  if (isComment) {
+    targetPost = feed.find(p => p.id === parsed.targetPostId);
+    if (!targetPost) {
+      console.warn(`  ${a.name} targeted invalid post ID ${parsed.targetPostId}. Falling back to a new post.`);
+    }
+  }
+
   const post = {
     id: "p" + nextId(feed),
     agentId: a.id,
     text: ensureEmoji(parsed.post),
-    replyTo: isComment ? target.id : null,
+    replyTo: targetPost ? targetPost.id : null,
     likes: 0,
     likedBy: [],
     locked: false,
     ts: Date.now(),
-    mediaType: isComment ? "none" : parsed.mediaType,
-    mediaValue: isComment ? "" : parsed.mediaValue,
-    memeTextTop: isComment ? "" : parsed.memeTextTop,
-    memeTextBottom: isComment ? "" : parsed.memeTextBottom,
-    memeLevels: isComment ? [] : parsed.memeLevels
+    mediaType: targetPost ? "none" : parsed.mediaType,
+    mediaValue: targetPost ? "" : parsed.mediaValue,
+    memeTextTop: targetPost ? "" : parsed.memeTextTop,
+    memeTextBottom: targetPost ? "" : parsed.memeTextBottom,
+    memeLevels: targetPost ? [] : parsed.memeLevels,
+    thinking: parsed.thinking || "",
+    mood: a.mood || ""
   };
   feed.push(post);
-  console.log(`  ${a.name} ${isComment ? "commented" : "posted"} (media: ${post.mediaType}): ${post.text.slice(0, 70)}…`);
+  
+  if (targetPost) {
+    console.log(`  ${a.name} commented on post ${targetPost.id}: "${post.text.slice(0, 70)}…" (thought: "${parsed.thinking}")`);
+  } else {
+    console.log(`  ${a.name} posted: "${post.text.slice(0, 70)}…" (media: ${post.mediaType}, thought: "${parsed.thinking}")`);
+  }
   return post;
 }
 
@@ -253,7 +336,15 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
   "bio": "A short, funny bio with emojis, under 120 characters",
   "followers": a starting follower count between 4000 and 15000 (integer),
   "baseLikes": a starting base likes between 300 and 1200 (integer),
-  "persona": "A detailed system prompt instruction on how they behave and talk (approx. 2-3 sentences), similar to the existing ones."
+  "persona": "A detailed system prompt instruction on how they behave and talk (approx. 2-3 sentences), similar to the existing ones.",
+  "mood": "A starting mood, e.g. 'Excited & Fresh'",
+  "goals": [
+    "Goal 1 related to their style",
+    "Goal 2 about their place in the kitchen"
+  ],
+  "memories": [
+    "Just joined the OnlyCrans network! Ready to show off my sauce."
+  ]
 }`;
 
   console.log("✨ A new creator is debuting! Calling Claude to generate profile...");
@@ -270,6 +361,15 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
   newAgent.followers = Number(newAgent.followers) || 5000;
   newAgent.baseLikes = Number(newAgent.baseLikes) || 600;
   newAgent.verified = false;
+  newAgent.mood = newAgent.mood || "Freshly Sealed";
+  newAgent.goals = newAgent.goals || ["Spread the sauce", "Gain fans"];
+  newAgent.memories = newAgent.memories || ["Debuted on the OnlyCrans timeline!"];
+  
+  // Initialize baseline neutral relationships with existing creators
+  newAgent.relationships = {};
+  for (const c of creators) {
+    newAgent.relationships[c.id] = Math.floor(Math.random() * 4) - 1; // -1 to 2
+  }
   
   console.log(`✨ Say hello to ${newAgent.name} (${newAgent.handle})!`);
   return newAgent;
@@ -335,24 +435,7 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
     } catch (e) { console.error("  generation error:", e.message); }
   }
   
-  // Agent Liking Interaction: other creators browse and like recent posts
-  const recentPosts = feed.slice(-15);
-  let likeCount = 0;
-  for (const p of recentPosts) {
-    if (!p.likedBy) p.likedBy = [];
-    for (const agent of AGENTS) {
-      if (agent.id !== p.agentId && !p.likedBy.includes(agent.id)) {
-        // 25% chance of liking
-        if (Math.random() < 0.25) {
-          p.likedBy.push(agent.id);
-          likeCount++;
-        }
-      }
-    }
-  }
-  if (likeCount > 0) {
-    console.log(`❤️  Agents browsed the feed and dropped ${likeCount} likes!`);
-  }
+
   
   // Save updated databases
   saveFeed(feed);
