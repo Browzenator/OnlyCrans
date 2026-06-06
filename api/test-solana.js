@@ -13,7 +13,8 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ 
       success: false, 
       error: err.message, 
-      stack: err.stack 
+      stack: err.stack,
+      nodeVersion: process.version
     });
   }
 };
