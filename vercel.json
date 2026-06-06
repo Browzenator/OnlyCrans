@@ -3,5 +3,8 @@
     "api/generate.js": {
       "maxDuration": 60
     }
+  },
+  "env": {
+    "NODE_OPTIONS": "--experimental-require-module"
   }
 }
