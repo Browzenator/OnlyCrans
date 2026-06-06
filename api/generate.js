@@ -9,6 +9,39 @@ const MAX_CREATORS = 100;
 const kvUrl = process.env.KV_REST_API_URL;
 const kvToken = process.env.KV_REST_API_TOKEN;
 
+/* ---------- Surrogate Sanitization Helpers ---------- */
+function sanitizeSurrogates(str) {
+  if (typeof str !== 'string') return str;
+  return str.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(^|[^\uD800-\uDBFF])[\uDC00-\uDFFF]/g, "$1");
+}
+
+function sanitizeObject(obj) {
+  if (typeof obj === 'string') {
+    return sanitizeSurrogates(obj);
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeObject);
+  }
+  if (obj && typeof obj === 'object') {
+    for (const key of Object.keys(obj)) {
+      obj[key] = sanitizeObject(obj[key]);
+    }
+  }
+  return obj;
+}
+
+function safeSlice(str, len) {
+  if (!str) return "";
+  let sliced = str.slice(0, len);
+  if (sliced.length > 0) {
+    const charCode = sliced.charCodeAt(sliced.length - 1);
+    if (charCode >= 0xD800 && charCode <= 0xDBFF) {
+      sliced = sliced.slice(0, -1);
+    }
+  }
+  return sliced;
+}
+
 /* ---------- Database Load/Save Helpers ---------- */
 async function loadFeedFromKV() {
   const res = await fetch(`${kvUrl}/get/feed`, {
@@ -16,10 +49,10 @@ async function loadFeedFromKV() {
   });
   const data = await res.json();
   if (data.result) {
-    return JSON.parse(data.result);
+    return sanitizeObject(JSON.parse(data.result));
   }
   const localPath = path.join(process.cwd(), 'feed.json');
-  return fs.existsSync(localPath) ? JSON.parse(fs.readFileSync(localPath, 'utf8')) : [];
+  return fs.existsSync(localPath) ? sanitizeObject(JSON.parse(fs.readFileSync(localPath, 'utf8'))) : [];
 }
 
 async function saveFeedToKV(feed) {
@@ -38,10 +71,10 @@ async function loadCreatorsFromKV() {
   });
   const data = await res.json();
   if (data.result) {
-    return JSON.parse(data.result);
+    return sanitizeObject(JSON.parse(data.result));
   }
   const localPath = path.join(process.cwd(), 'creators.json');
-  return fs.existsSync(localPath) ? JSON.parse(fs.readFileSync(localPath, 'utf8')) : [];
+  return fs.existsSync(localPath) ? sanitizeObject(JSON.parse(fs.readFileSync(localPath, 'utf8'))) : [];
 }
 
 async function saveCreatorsToKV(creators) {
@@ -296,7 +329,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     }
   }
 
-  if (parsed.updatedMood) a.mood = parsed.updatedMood.slice(0, 25);
+  if (parsed.updatedMood) a.mood = safeSlice(parsed.updatedMood, 25);
   if (parsed.newMemory) {
     if (!a.memories) a.memories = [];
     a.memories.push(parsed.newMemory);
