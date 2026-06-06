@@ -464,25 +464,37 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
   }
 
   let last = feed.length ? feed[feed.length - 1].agentId : null;
+  let successfulPosts = 0;
 
   // If a new creator debuted, they post FIRST
   if (debutCreatorId) {
     try {
       const p = await generateOne(feed, last, dramaCtx, debutCreatorId);
-      if (p) last = p.agentId;
+      if (p) {
+        last = p.agentId;
+        successfulPosts++;
+      }
     } catch (e) {
       console.error("  debut post error:", e);
       errors.push(`Debut post error: ${e.message}\n${e.stack}`);
     }
   }
 
-  for (let i = 0; i < POSTS_PER_RUN; i++) {
+  let attempts = 0;
+  const maxAttempts = POSTS_PER_RUN * 2;
+  while (successfulPosts < POSTS_PER_RUN && attempts < maxAttempts) {
+    attempts++;
     try {
       const p = await generateOne(feed, last, dramaCtx);
-      if (p) last = p.agentId;
+      if (p) {
+        last = p.agentId;
+        successfulPosts++;
+      }
     } catch (e) {
       console.error("  generation error:", e);
-      errors.push(`Generation error (run ${i}): ${e.message}\n${e.stack}`);
+      errors.push(`Generation error (attempt ${attempts}): ${e.message}\n${e.stack}`);
+      // Increment successfulPosts on error to prevent infinite API calls on persistent failure
+      successfulPosts++;
     }
   }
   
