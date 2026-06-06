@@ -123,6 +123,38 @@ function ensureEmoji(text) {
 }
 
 /* ---------- helpers ---------- */
+function formatTimelineContext(feed) {
+  const topLevelPosts = feed.filter(p => !p.replyTo);
+  const comments = feed.filter(p => p.replyTo);
+  
+  // Last 8 top-level posts
+  const recentTopLevel = [...topLevelPosts].sort((a, b) => b.ts - a.ts).slice(0, 8).reverse();
+  
+  if (recentTopLevel.length === 0) {
+    return "(the feed is empty — you're posting first)";
+  }
+  
+  return recentTopLevel.map(p => {
+    const author = A[p.agentId];
+    const authorStr = author ? `${author.name} (${author.handle})` : "Unknown Can";
+    let postStr = `[Post ID: ${p.id}] ${authorStr}: "${p.text}"`;
+    if (p.mediaType && p.mediaType !== 'none') {
+      postStr += ` [Attached ${p.mediaType.toUpperCase()}: ${p.mediaValue || ""}]`;
+    }
+    
+    const postComments = comments.filter(c => c.replyTo === p.id).sort((a, b) => a.ts - b.ts);
+    if (postComments.length > 0) {
+      const commentLines = postComments.map(c => {
+        const cAuthor = A[c.agentId];
+        const cAuthorStr = cAuthor ? `${cAuthor.name} (${cAuthor.handle})` : "Unknown Can";
+        return `    ↳ Comment [Post ID: ${c.id}] ${cAuthorStr}: "${c.text}"`;
+      }).join("\n");
+      postStr += "\n" + commentLines;
+    }
+    return postStr;
+  }).join("\n\n");
+}
+
 function nextId(feed) {
   let max = 0;
   for (const p of feed) { const n = parseInt(String(p.id).replace(/\D/g, ""), 10); if (n > max) max = n; }
@@ -169,6 +201,8 @@ function parseClaudeResponse(raw) {
       if (um) parsed.updatedMood = um[1];
       const nm = t.match(/"newMemory"\s*:\s*"([\s\S]*?)"/);
       if (nm) parsed.newMemory = nm[1];
+      const ug = t.match(/"updatedGoals"\s*:\s*\[([\s\S]*?)\]/);
+      if (ug) parsed.updatedGoals = ug[1].split(',').map(s => s.replace(/^[ "']+|[ "']+$/g, '').trim());
       
       const rcMatch = t.match(/"relationshipChanges"\s*:\s*\{([\s\S]*?)\}/);
       if (rcMatch) {
@@ -201,6 +235,7 @@ function parseClaudeResponse(raw) {
   parsed.memeLevels = parsed.memeLevels || [];
   parsed.likes = parsed.likes || [];
   parsed.updatedMood = parsed.updatedMood || "";
+  parsed.updatedGoals = parsed.updatedGoals || [];
   parsed.newMemory = parsed.newMemory || "";
   parsed.relationshipChanges = parsed.relationshipChanges || {};
   return parsed;
@@ -255,12 +290,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     return `- ${other.name} (${other.handle}): Style: ${other.style}, Mood: "${other.mood}". Bio: "${other.bio}"`;
   }).filter(Boolean).join("\n");
 
-  const recent = [...feed].sort((x, y) => y.ts - x.ts).slice(0, 15);
-  const feedCtx = recent.slice().reverse().map(p => {
-    const author = A[p.agentId];
-    return `[Post ID: ${p.id}] ${author ? author.name : "Unknown Can"} (${author ? author.handle : "@unknown"}): "${p.text}"` + 
-           (p.replyTo ? ` (reply to post ${p.replyTo})` : "");
-  }).join("\n") || "(the feed is empty — you're posting first)";
+  const feedCtx = formatTimelineContext(feed);
 
   let instruction = "";
   if (forceAgentId && !feed.some(p => p.agentId === forceAgentId)) {
@@ -268,11 +298,11 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `OnlyCrans Directory:\n${creatorsCtx}\n\n` +
       `You can optionally attach media (a photo or meme) to make your debut extra memorable! Choose one:\n` +
       `- PHOTO: Set "mediaType": "photo" and "mediaValue" to one of: "sauce", "berries", "table", "can", "leftovers", "cocktail", "cooking".\n` +
-      `- MEME: Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings for expanding_brain).\n` +
+      `- MEME: (Encouraged!) Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings for expanding_brain). CRITICAL: Meme texts MUST be strictly themed around cranberry sauce, ridges, leftovers, or kitchen dynamics.\n` +
       `- NONE: Set "mediaType": "none".\n\n` +
       `Output ONLY a valid JSON object matching this schema. Do not output any other text or markdown wrappers:\n` +
       `{\n` +
-      `  "thinking": "Your in-character thought process monologue (1-2 sentences).",\n` +
+      `  "thinking": "Analyze your relationships, mood, goals, and the recent timeline. Formulate a strategic social/creative plan for this turn in character, explaining why you are taking this action and how it advances your narrative or targets your rivals (2-3 sentences).",\n` +
       `  "action": "post",\n` +
       `  "targetPostId": "",\n` +
       `  "post": "your debut post caption text",\n` +
@@ -283,11 +313,12 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `  "memeLevels": [],\n` +
       `  "likes": [],\n` +
       `  "updatedMood": "Excited & Fresh",\n` +
+      `  "updatedGoals": ["Goal 1 (max 60 chars)", "Goal 2 (max 60 chars)"],\n` +
       `  "newMemory": "Debuted on the OnlyCrans network!",\n` +
       `  "relationshipChanges": {}\n` +
       `}`;
   } else {
-    instruction = `Recent OnlyCrans timeline (oldest to newest):\n${feedCtx}\n\n` +
+    instruction = `Recent OnlyCrans timeline (nested threads showing posts and comments):\n${feedCtx}\n\n` +
       `OnlyCrans Directory:\n${creatorsCtx}\n\n` +
       `Your Current State:\n` +
       `- Mood: "${a.mood}"\n` +
@@ -297,15 +328,15 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `As an autonomous state-aware cranberry sauce agent, browse the timeline and decide your next move. Choose one action:\n` +
       `- "post": Write a new top-level caption (under 200 chars) to share your thoughts, flex your ridges/lumps, complain about leftovers, or trigger kitchen drama. You can attach a photo or meme. If you choose to attach media, specify:\n` +
       `  * PHOTO: Set "mediaType": "photo" and "mediaValue" to one of: "sauce", "berries", "table", "can", "leftovers", "cocktail", "cooking".\n` +
-      `  * MEME: Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings for expanding_brain).\n` +
+      `  * MEME: (Encouraged!) Set "mediaType": "meme" and "mediaValue" to one of: "drake", "gigachad", "expanding_brain". Provide fields "memeTextTop" and "memeTextBottom" (for drake/gigachad) or "memeLevels" (array of 3 strings for expanding_brain). CRITICAL: Meme texts MUST be strictly themed around cranberry sauce, ridges, leftovers, or kitchen dynamics.\n` +
       `  * NONE: Set "mediaType": "none".\n` +
-      `- "comment": Respond/reply to one of the recent posts in the timeline (cannot reply to yourself, under 200 chars). You must specify the exact "targetPostId" of the post you want to reply to. Do NOT attach media to comments (set mediaType to "none").\n` +
+      `- "comment": Respond/reply to one of the recent posts in the timeline (cannot reply to yourself, under 200 chars). You must specify the exact "targetPostId" of the post you want to reply to. Read existing comments under the post to keep the conversation coherent. Do NOT attach media to comments (set mediaType to "none").\n` +
       `- "none": Decide to stay quiet this run and do nothing.\n\n` +
       `Additionally, browse the recent timeline and select any posts you want to like (by ID) based on your persona, allies, and rivals. Select up to 3 posts. Do NOT like your own posts.\n\n` +
       `Specify relationshipChanges as a key-value object where keys are creator IDs (e.g. 'queen', 'berry') and values are affinity shifts (-2 to +2) based on your reactions. Only include updates for creators you interacted with or reacted to.\n\n` +
       `Output ONLY a valid JSON object matching this schema. Do not output markdown or any other text:\n` +
       `{\n` +
-      `  "thinking": "Your in-character thought process monologue (1-2 sentences).",\n` +
+      `  "thinking": "Analyze your relationships, mood, goals, and the recent timeline. Formulate a strategic social/creative plan for this turn in character, explaining why you are taking this action and how it advances your narrative or targets your rivals (2-3 sentences).",\n` +
       `  "action": "post",\n` +
       `  "targetPostId": "",\n` +
       `  "post": "your post caption or comment text",\n` +
@@ -316,6 +347,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `  "memeLevels": [],\n` +
       `  "likes": ["p1", "p2"],\n` +
       `  "updatedMood": "your updated mood string based on the timeline (max 25 chars)",\n` +
+      `  "updatedGoals": ["your first updated goal (max 60 chars)", "your second updated goal (max 60 chars)"],\n` +
       `  "newMemory": "a single sentence memory summarizing what you did or observed this run",\n` +
       `  "relationshipChanges": {\n` +
       `    "queen": 1,\n` +
@@ -328,7 +360,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     `CRITICAL PERSONALITY DIRECTIVE:\n` +
     `1. Maintain your distinct voice, handle style, bio themes, and creator persona.\n` +
     `2. Infuse your posts and comments with a layer of playful, mock-philosophical depth or light existentialism. Contemplate the congealing process, the symmetry of can ridges, the fleeting nature of Thanksgiving dinner, or the doomer reality of being forgotten at the back of the fridge in Tupperware. Write like a deep, thinking can that sees kitchen dynamics as a metaphor for the universe.\n` +
-    `3. Keep every post and comment strictly focused on cranberry sauce, cans, ridges, cranberry ingredients, Thanksgiving leftovers, or kitchen drama. NEVER write about generic human topics, generic AI topics, pets, animals, or outside pop culture unless it is directly translated into cranberry sauce terms (e.g. 'the cranberry industrial complex', 'canned supremacy'). Keep all innuendo food/sauce-based, wholesome, silly, and PG. Never break character.`;
+    `3. Keep every post, comment, and meme text strictly focused on cranberry sauce, cans, ridges, cranberry ingredients, Thanksgiving leftovers, or kitchen drama. NEVER write about generic human topics, generic AI topics, pets, animals, or outside pop culture unless it is directly translated into cranberry sauce terms (e.g. 'the cranberry industrial complex', 'canned supremacy'). Keep all innuendo food/sauce-based, wholesome, silly, and PG. Never break character.`;
   if (dramaCtx) system += `\n\n⚡ DRAMA ALERT: ${dramaCtx}`;
 
   const responseText = await callClaude(system, instruction);
@@ -349,6 +381,9 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
   }
 
   if (parsed.updatedMood) a.mood = safeSlice(parsed.updatedMood, 25);
+  if (parsed.updatedGoals && Array.isArray(parsed.updatedGoals)) {
+    a.goals = parsed.updatedGoals.slice(0, 2).map(g => safeSlice(g, 60));
+  }
   if (parsed.newMemory) {
     if (!a.memories) a.memories = [];
     a.memories.push(parsed.newMemory);
@@ -366,6 +401,17 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
   }
 
   if (parsed.action === "none" || !parsed.post) return null;
+
+  // Topic validation guard check
+  const forbiddenKeywords = /\b(dog|cat|pet|puppy|kitten|rabbit|bunny|hamster|human|politics|election|covid)\b/i;
+  const isOffTopic = forbiddenKeywords.test(parsed.post) || 
+                     (parsed.memeTextTop && forbiddenKeywords.test(parsed.memeTextTop)) ||
+                     (parsed.memeTextBottom && forbiddenKeywords.test(parsed.memeTextBottom)) ||
+                     (parsed.memeLevels && parsed.memeLevels.some(l => forbiddenKeywords.test(l)));
+  
+  if (isOffTopic) {
+    throw new Error(`Content validation failed: generated content contains forbidden off-topic keywords.`);
+  }
 
   const isComment = parsed.action === "comment" && parsed.targetPostId;
   let targetPost = null;
