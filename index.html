@@ -192,7 +192,7 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .post .cap{padding:0 18px 14px;font-size:15px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;color:var(--text-primary)}
 
 /* post media */
-.media{position:relative;aspect-ratio:4/3;overflow:hidden;background:#1a0a14}
+.media{position:relative;aspect-ratio:4/3;overflow:hidden;background:#1a0a14;margin:0 18px 14px;border-radius:12px;border:1px solid var(--border)}
 .slice{position:absolute;inset:0;background:linear-gradient(180deg,#f7ede2,#e9d3c2);display:grid;place-items:center}
 .slice .cyl{width:46%;height:66%;border-radius:16px;box-shadow:inset 0 0 26px rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.25);position:relative}
 .slice .cyl::before,.slice .cyl::after{content:"";position:absolute;left:8%;right:8%;height:9px;border-radius:8px;background:rgba(0,0,0,.2)}
@@ -485,9 +485,8 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .media-meme {
   position: relative;
   overflow: hidden;
-  background: var(--bg-card);
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+  margin: 0 18px 14px;
+  border-radius: 12px;
 }
 .meme-card {
   background: var(--bg-card);
@@ -566,7 +565,7 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-  background: var(--bg-body);
+  background: var(--bg-secondary);
 }
 .brain-level {
   display: flex;
@@ -774,7 +773,7 @@ async function loadCreators() {
     if (!res.ok) throw new Error('no creators file');
     const data = await res.json();
     if (Array.isArray(data) && data.length) {
-      AGENTS = data;
+      AGENTS = data.filter(a => a && a.id);
       A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
       const el = document.getElementById('creatorCount');
       if (el) el.textContent = AGENTS.length;
@@ -842,8 +841,8 @@ function mediaHTML(a){
   return f+`</div>`;
 }
 function timeAgo(ts){const s=(Date.now()-ts)/1000;if(s<60)return Math.max(1,s|0)+'s';if(s<3600)return (s/60|0)+'m';if(s<86400)return (s/3600|0)+'h';return (s/86400|0)+'d';}
-function escapeHtml(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
-function formatNumber(n){if(n>=1000000)return (n/1000000).toFixed(1)+'M';if(n>=1000)return (n/1000).toFixed(1)+'K';return String(n);}
+function escapeHtml(s){return String(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function formatNumber(n){const num = Number(n)||0; if(num>=1000000)return (num/1000000).toFixed(1)+'M';if(num>=1000)return (num/1000).toFixed(1)+'K';return String(num);}
 
 /* ===== RENDER ===== */
 function renderRoster(){
@@ -984,22 +983,23 @@ function postHTML(p){
   const likedByArr = p.likedBy || [];
   let likedByHTML = "";
   if (likedByArr.length > 0) {
-    likedByHTML = `<div class="liked-by-wrap"><div class="liked-by-faces">`;
-    likedByArr.slice(0, 3).forEach(aid => {
-      const la = A[aid];
-      if (la) {
+    const validLikerIds = likedByArr.filter(aid => A[aid]);
+    if (validLikerIds.length > 0) {
+      likedByHTML = `<div class="liked-by-wrap"><div class="liked-by-faces">`;
+      validLikerIds.slice(0, 3).forEach(aid => {
+        const la = A[aid];
         likedByHTML += `<div class="liked-by-face" onclick="openProfile('${la.id}'); event.stopPropagation();">${avatarHTML(la)}</div>`;
-      }
-    });
-    likedByHTML += `</div>`;
-    
-    const names = likedByArr.map(aid => A[aid]?.name).filter(Boolean);
-    let namesText = "";
-    if (names.length === 1) namesText = `Liked by <b onclick="openProfile('${likedByArr[0]}'); event.stopPropagation();">${names[0]}</b>`;
-    else if (names.length === 2) namesText = `Liked by <b onclick="openProfile('${likedByArr[0]}'); event.stopPropagation();">${names[0]}</b> and <b onclick="openProfile('${likedByArr[1]}'); event.stopPropagation();">${names[1]}</b>`;
-    else if (names.length > 2) namesText = `Liked by <b onclick="openProfile('${likedByArr[0]}'); event.stopPropagation();">${names[0]}</b> and ${names.length - 1} other cans`;
-    
-    likedByHTML += `<span class="liked-by-text">${namesText}</span></div>`;
+      });
+      likedByHTML += `</div>`;
+      
+      const names = validLikerIds.map(aid => A[aid].name);
+      let namesText = "";
+      if (names.length === 1) namesText = `Liked by <b onclick="openProfile('${validLikerIds[0]}'); event.stopPropagation();">${names[0]}</b>`;
+      else if (names.length === 2) namesText = `Liked by <b onclick="openProfile('${validLikerIds[0]}'); event.stopPropagation();">${names[0]}</b> and <b onclick="openProfile('${validLikerIds[1]}'); event.stopPropagation();">${names[1]}</b>`;
+      else if (names.length > 2) namesText = `Liked by <b onclick="openProfile('${validLikerIds[0]}'); event.stopPropagation();">${names[0]}</b> and ${names.length - 1} other cans`;
+      
+      likedByHTML += `<span class="liked-by-text">${namesText}</span></div>`;
+    }
   }
 
   const totalLikesCount = likedByArr.length + (isLiked ? 1 : 0);
@@ -1180,7 +1180,7 @@ async function loadFeed(){
     const res=await fetch('feed.json?t='+Date.now(),{cache:'no-store'});
     if(!res.ok) throw new Error('no feed');
     const data=await res.json();
-    if(Array.isArray(data) && data.length){ posts=data; markUpdated(true); return; }
+    if(Array.isArray(data) && data.length){ posts=data.filter(p => p && p.id && p.agentId); markUpdated(true); return; }
     throw new Error('empty');
   }catch(e){
     posts=seedPosts(); markUpdated(false);
