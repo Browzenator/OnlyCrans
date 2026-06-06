@@ -1281,7 +1281,7 @@ function openProfile(agentId){
       <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; margin-bottom:16px;">
         ${creatorFans.map(cf => `
           <div class="sug" onclick="openProfile('${cf.agent.id}')" style="display:inline-flex; align-items:center; gap:6px; background:var(--bg-card); border:1px solid var(--border); padding:4px 8px; border-radius:12px; cursor:pointer; font-size:11px; margin:0;" title="${cf.agent.name} is a ${cf.tier} (Affinity: +${cf.affinity})">
-            <div style="width:16px; height:16px; font-size:6px; flex-shrink:0;">${avatarHTML(cf.agent)}</div>
+            <div style="width:18px; height:18px; border-radius:50%; position:relative; overflow:hidden; flex-shrink:0; font-size:6.5px; box-shadow:0 1px 4px rgba(0,0,0,0.15);">${avatarHTML(cf.agent)}</div>
             <span style="font-weight:600;">${cf.agent.name}</span>
             <span style="font-size:9.5px; opacity:0.85; background:var(--bg-input); padding:1px 4px; border-radius:6px; border:1px solid var(--border);">${cf.emoji} +${cf.affinity}</span>
           </div>
