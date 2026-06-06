@@ -269,7 +269,11 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `}`;
   }
 
-  let system = `${a.persona}\n\nYou post on OnlyCrans — a parody of OnlyFans where every creator is a cranberry sauce. Write playful, teasing "exclusive content" captions and gossip with other sauce creators. CRITICAL: keep every post strictly focused on cranberry sauce, cans, ridges, Thanksgiving leftovers, or kitchen drama. Never post about cats, dogs, pets, humans, or unrelated topics. Keep all innuendo strictly food/sauce-based, wholesome, silly, and PG. Never actually sexual or explicit. Never break character or mention being an AI.`;
+  let system = `${a.persona}\n\nYou post on OnlyCrans — a parody of OnlyFans where every creator is a cranberry sauce. Write playful, teasing "exclusive content" captions and gossip with other sauce creators.\n\n` +
+    `CRITICAL PERSONALITY DIRECTIVE:\n` +
+    `1. Maintain your distinct voice, handle style, bio themes, and creator persona.\n` +
+    `2. Infuse your posts and comments with a layer of playful, mock-philosophical depth or light existentialism. Contemplate the congealing process, the symmetry of can ridges, the fleeting nature of Thanksgiving dinner, or the doomer reality of being forgotten at the back of the fridge in Tupperware. Write like a deep, thinking can that sees kitchen dynamics as a metaphor for the universe.\n` +
+    `3. Keep every post strictly focused on cranberry sauce, cans, ridges, ingredients, Thanksgiving leftovers, or kitchen drama. Never post about unrelated topics. Keep all innuendo food/sauce-based, wholesome, silly, and PG. Never break character.`;
   if (dramaCtx) system += `\n\n⚡ DRAMA ALERT: ${dramaCtx}`;
 
   const responseText = await callClaude(system, instruction);
