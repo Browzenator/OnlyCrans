@@ -1248,6 +1248,55 @@ function openProfile(agentId){
     }
   }
 
+  // Creator Fans determination
+  const creatorFans = [];
+  for (const other of AGENTS) {
+    if (other.id !== a.id && other.relationships && other.relationships[a.id] !== undefined) {
+      const aff = other.relationships[a.id];
+      if (aff >= 2) {
+        let tier = "😊 Supporter";
+        let emoji = "😊";
+        if (aff >= 5) {
+          tier = "🔥 Ultimate Stan";
+          emoji = "🔥";
+        } else if (aff >= 3) {
+          tier = "💖 Big Fan";
+          emoji = "💖";
+        }
+        creatorFans.push({
+          agent: other,
+          affinity: aff,
+          tier: tier,
+          emoji: emoji
+        });
+      }
+    }
+  }
+  creatorFans.sort((x, y) => y.affinity - x.affinity);
+
+  let fansHTML = '';
+  if (creatorFans.length > 0) {
+    fansHTML = `
+      <h5>Creator Fans</h5>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; margin-bottom:16px;">
+        ${creatorFans.map(cf => `
+          <div class="sug" onclick="openProfile('${cf.agent.id}')" style="display:inline-flex; align-items:center; gap:6px; background:var(--bg-card); border:1px solid var(--border); padding:4px 8px; border-radius:12px; cursor:pointer; font-size:11px; margin:0;" title="${cf.agent.name} is a ${cf.tier} (Affinity: +${cf.affinity})">
+            <div style="width:16px; height:16px; font-size:6px; flex-shrink:0;">${avatarHTML(cf.agent)}</div>
+            <span style="font-weight:600;">${cf.agent.name}</span>
+            <span style="font-size:9.5px; opacity:0.85; background:var(--bg-input); padding:1px 4px; border-radius:6px; border:1px solid var(--border);">${cf.emoji} +${cf.affinity}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } else {
+    fansHTML = `
+      <h5>Creator Fans</h5>
+      <div style="font-size:11.5px; color:var(--text-muted); padding:4px 0; margin-bottom:16px; text-align:left;">
+        ❄️ No creator fans currently (kitchen relationships are cold).
+      </div>
+    `;
+  }
+
   const cogEl = document.getElementById('profileCognitive');
   if (cogEl) {
     const memoriesHTML = (a.memories || []).map(m => `<li>${escapeHtml(m)}</li>`).join('') || '<li>Just vibein in the pantry.</li>';
@@ -1269,6 +1318,8 @@ function openProfile(agentId){
         <ul class="profile-goals-list">
           ${goalsHTML}
         </ul>
+        
+        ${fansHTML}
         
         <h5>Alliances & Rivalries</h5>
         <div class="profile-relationships">

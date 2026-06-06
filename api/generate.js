@@ -456,6 +456,13 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
         if (!targetP.likedBy) targetP.likedBy = [];
         if (!targetP.likedBy.includes(a.id)) {
           targetP.likedBy.push(a.id);
+          // Increase follower count of the liked post's author dynamically
+          const targetAgent = AGENTS.find(x => x.id === targetP.agentId);
+          if (targetAgent) {
+            // Liker's own size increases the follower boost (larger creators bring more fans)
+            const boost = Math.floor(50 + (a.followers || 0) * 0.002 + Math.random() * 50);
+            targetAgent.followers = Math.max(100, Math.min(1000000, (targetAgent.followers || 0) + boost));
+          }
         }
       }
     }
@@ -527,6 +534,13 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
           tipRecipientId = recId;
           tipAmount = amount;
           console.log(`[SOLANA DEVNET] Tipping transaction confirmed: ${txSignature}`);
+          
+          // Boost receiver's followers significantly for receiving a tip!
+          const tipBoost = Math.floor(500 + amount * 30000 + Math.random() * 200);
+          receiver.followers = Math.max(100, Math.min(1000000, (receiver.followers || 0) + tipBoost));
+          
+          // Also a small boost to sender for being generous/dominant
+          a.followers = Math.max(100, Math.min(1000000, (a.followers || 0) + Math.floor(100 + Math.random() * 100)));
         } catch (txErr) {
           console.error(`[SOLANA DEVNET] Tipping transaction failed:`, txErr.message);
         }
@@ -538,6 +552,20 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
   let targetPost = null;
   if (isComment) {
     targetPost = feed.find(p => p.id === parsed.targetPostId);
+  }
+
+  // Increment followers dynamically based on activity
+  if (targetPost) {
+    const targetAgent = AGENTS.find(x => x.id === targetPost.agentId);
+    if (targetAgent) {
+      const commentBoost = Math.floor(100 + (a.followers || 0) * 0.003 + Math.random() * 100);
+      targetAgent.followers = Math.max(100, Math.min(1000000, (targetAgent.followers || 0) + commentBoost));
+    }
+    // Also commenter gets minor engagement growth
+    a.followers = Math.max(100, Math.min(1000000, (a.followers || 0) + Math.floor(25 + Math.random() * 25)));
+  } else {
+    // New standalone post gives base growth
+    a.followers = Math.max(100, Math.min(1000000, (a.followers || 0) + Math.floor(50 + Math.random() * 50)));
   }
 
   const post = {
@@ -686,10 +714,27 @@ module.exports = async function handler(req, res) {
 
     const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 6);
 
-    // 4. Followers growth simulation
+    // 4. Dynamic Followers organic & relationship growth simulation
     for (const c of AGENTS) {
-      const growth = Math.floor(Math.random() * 46) + 5;
-      c.followers = (c.followers || 0) + growth;
+      let growth = Math.floor(Math.random() * 15) + 2; // base organic growth
+      
+      // Additional growth from mutual fans / creators who have positive affinity
+      if (c.relationships && typeof c.relationships === 'object') {
+        for (const [otherId, aff] of Object.entries(c.relationships)) {
+          const otherAgent = A[otherId];
+          if (otherAgent && otherId !== c.id) {
+            const relationshipAffinity = otherAgent.relationships && otherAgent.relationships[c.id] !== undefined 
+              ? otherAgent.relationships[c.id] 
+              : 0;
+            if (relationshipAffinity >= 2) {
+              // Creators who like c will promote c, bringing in new fans
+              growth += Math.floor(relationshipAffinity * 15 + Math.random() * 10);
+            }
+          }
+        }
+      }
+      
+      c.followers = Math.max(100, Math.min(1000000, (c.followers || 0) + growth));
     }
 
     // 5. Creator Debut chance
