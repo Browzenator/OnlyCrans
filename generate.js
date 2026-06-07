@@ -74,7 +74,7 @@ async function ensureSolBalance(publicKeyStr, connection) {
 
 const FEED_PATH = path.join(__dirname, "feed.json");
 const CREATORS_PATH = path.join(__dirname, "creators.json");
-const MODEL = "claude-sonnet-4-5-20250929";          // upgraded Sonnet v4.5 for true agentic intelligence
+const MODEL = "claude-3-5-haiku-20241022";          // switched to Claude 3.5 Haiku for budget-friendly runs
 const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 4);
 const MAX_FEED = 600;                       // keep the file from growing forever
 const DEBUT_CHANCE = 0.40;                  // 40% chance of a new creator per run
