@@ -6,7 +6,7 @@ const { Keypair, Connection, Transaction, SystemProgram, sendAndConfirmTransacti
 const MODEL = "claude-sonnet-4-5-20250929";
 const MAX_FEED = 600;
 const DEBUT_CHANCE = 0.40; // 40% chance of a new creator per run
-const MAX_CREATORS = 100;
+const MAX_CREATORS = 500;
 
 const kvUrl = process.env.KV_REST_API_URL;
 const kvToken = process.env.KV_REST_API_TOKEN;
@@ -466,10 +466,21 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     return `- ${other.name} (${other.handle}): Affinity: ${affinity}/10 (${relType})`;
   }).filter(Boolean).join("\n") || "- (No established relationships)";
   
-  const creatorsCtx = AGENTS.map(other => {
-    if (other.id === a.id) return "";
+  // Format other creators directory (optimized for context size/cost)
+  const recentTimelineAgents = new Set(feed.slice(-15).map(p => p.agentId).filter(Boolean));
+  const relationshipAgents = new Set(Object.keys(a.relationships || {}));
+  const relevantIds = new Set([...recentTimelineAgents, ...relationshipAgents]);
+  
+  let chosenAgents = AGENTS.filter(other => other.id !== a.id && relevantIds.has(other.id));
+  const remainingAgents = AGENTS.filter(other => other.id !== a.id && !relevantIds.has(other.id));
+  while (chosenAgents.length < 15 && remainingAgents.length > 0) {
+    const idx = Math.floor(Math.random() * remainingAgents.length);
+    chosenAgents.push(remainingAgents.splice(idx, 1)[0]);
+  }
+  
+  const creatorsCtx = chosenAgents.map(other => {
     return `- ${other.name} (${other.handle}): Style: ${other.style}, Mood: "${other.mood}". Bio: "${other.bio}"`;
-  }).filter(Boolean).join("\n");
+  }).join("\n");
 
   const feedCtx = formatTimelineContext(feed);
 
