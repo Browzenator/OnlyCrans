@@ -774,8 +774,11 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .ticker-content {
   display: flex;
   white-space: nowrap;
-  animation: ticker-scroll 100s linear infinite;
+  animation: ticker-scroll 350s linear infinite;
   padding-left: 20%;
+}
+.stock-ticker:hover .ticker-content {
+  animation-play-state: paused;
 }
 .ticker-item {
   display: flex;
