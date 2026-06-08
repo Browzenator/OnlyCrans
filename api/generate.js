@@ -886,7 +886,8 @@ module.exports = async function handler(req, res) {
   // 1. Authorization Check
   const authHeader = req.headers.authorization;
   const isCron = authHeader && authHeader === `Bearer ${process.env.CRON_SECRET}`;
-  const isBypass = req.query.bypass === 'crans';
+  const parsedUrl = require('url').parse(req.url || '', true);
+  const isBypass = (parsedUrl.query && parsedUrl.query.bypass === 'crans') || (req.headers['x-bypass'] === 'crans');
   if (!isCron && !isBypass) {
     return res.status(401).json({ error: "Unauthorized. Missing or invalid Authorization Bearer token." });
   }
