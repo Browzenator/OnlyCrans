@@ -1,26 +1,33 @@
-Generation error (attempt 1): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbqmZ5mS4YY2ZHELMvBHB"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbqmZ5mS4YY2ZHELMvBHB"}
+Failed to generate new creator: API 404: {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-haiku-20241022"},"request_id":"req_011CbqoPT91mTjGu9dwBhotV"}
+Error: API 404: {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-haiku-20241022"},"request_id":"req_011CbqoPT91mTjGu9dwBhotV"}
+    at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:459:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateNewCreator (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:804:15)
+    at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:906:24)
+
+Generation error (attempt 1): API 404: {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-haiku-20241022"},"request_id":"req_011CbqoPUB2AFAJh8vWV9xrR"}
+Error: API 404: {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-haiku-20241022"},"request_id":"req_011CbqoPUB2AFAJh8vWV9xrR"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:459:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:595:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:947:17)
 
-Generation error (attempt 2): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbqmZ6bnLwLdSZTwMzcot"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbqmZ6bnLwLdSZTwMzcot"}
+Generation error (attempt 2): API 404: {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-haiku-20241022"},"request_id":"req_011CbqoPUkW5N99qNxPPntno"}
+Error: API 404: {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-haiku-20241022"},"request_id":"req_011CbqoPUkW5N99qNxPPntno"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:459:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:595:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:947:17)
 
-Generation error (attempt 3): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbqmZ7AGVQc1Q2brmJBFw"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbqmZ7AGVQc1Q2brmJBFw"}
+Generation error (attempt 3): API 404: {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-haiku-20241022"},"request_id":"req_011CbqoPVNx6j2AT1Ta9XCpP"}
+Error: API 404: {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-haiku-20241022"},"request_id":"req_011CbqoPVNx6j2AT1Ta9XCpP"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:459:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:595:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:947:17)
 
-Generation error (attempt 4): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbqmZ7kVPuKXT9PyEAEyP"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbqmZ7kVPuKXT9PyEAEyP"}
+Generation error (attempt 4): API 404: {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-haiku-20241022"},"request_id":"req_011CbqoPVqjTFWXTwB9dPxU1"}
+Error: API 404: {"type":"error","error":{"type":"not_found_error","message":"model: claude-3-5-haiku-20241022"},"request_id":"req_011CbqoPVqjTFWXTwB9dPxU1"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:459:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:595:24)
