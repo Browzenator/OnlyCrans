@@ -732,6 +732,227 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
   .logo{font-size:24px}
   .scroll-top{bottom:80px;right:16px}
 }
+/* ===== LIVE CAN JIGGLE ===== */
+.can-av, .berry-av, .bb, .j {
+  transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.can-av:hover, .berry-av:hover {
+  transform: scale(1.08) rotate(2deg);
+}
+.can-av:active, .berry-av:active, .jiggle-active {
+  animation: wobble 0.45s ease-in-out;
+}
+@keyframes wobble {
+  0% { transform: scale(1) rotate(0); }
+  15% { transform: scale(1.15, 0.85) rotate(-4deg); }
+  30% { transform: scale(0.85, 1.15) rotate(4deg); }
+  45% { transform: scale(1.08, 0.92) rotate(-2deg); }
+  60% { transform: scale(0.95, 1.05) rotate(1deg); }
+  75% { transform: scale(1.02, 0.98) rotate(-0.5deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+/* ===== RELISH MARKET TICKER ===== */
+.stock-ticker {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background: var(--topbar-bg);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border-top: 1px solid var(--border);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+.ticker-content {
+  display: flex;
+  white-space: nowrap;
+  animation: ticker-scroll 45s linear infinite;
+  padding-left: 20%;
+}
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 36px;
+}
+.ticker-symbol {
+  font-weight: 800;
+  color: var(--text-primary);
+}
+.ticker-price {
+  font-weight: 600;
+}
+.ticker-change {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.ticker-change.up { color: #4caf50; }
+.ticker-change.down { color: #f44336; }
+@keyframes ticker-scroll {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+body {
+  padding-bottom: 32px;
+}
+
+/* ===== SOUND TOGGLE ===== */
+.sound-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s, background-color 0.2s;
+  width: 32px;
+  height: 32px;
+}
+.sound-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-input);
+}
+
+/* ===== HOLIDAY THREAT LEVEL ===== */
+.threat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 18px;
+}
+.threat-title {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary);
+}
+.threat-gauge {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 12px;
+}
+.threat-fill {
+  height: 100%;
+  width: 0%;
+  transition: width 0.8s cubic-bezier(0.1, 0.8, 0.2, 1), background-color 0.8s;
+}
+.threat-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+}
+.threat-countdown {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin-top: 8px;
+  border-top: 1px dashed var(--border);
+  padding-top: 8px;
+}
+
+/* ===== INTERACTIVE POLL UI ===== */
+.poll-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-top: 12px;
+}
+.poll-question {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+.poll-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.poll-opt-btn {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s, background-color 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1;
+}
+.poll-opt-btn:hover:not(.disabled) {
+  border-color: var(--cran);
+  background-color: var(--bg-card-hover);
+}
+.poll-opt-btn.voted-choice {
+  border-color: var(--cran);
+}
+.poll-opt-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(201, 26, 74, 0.12);
+  z-index: -1;
+  transition: width 0.8s cubic-bezier(0.1, 0.8, 0.2, 1);
+  width: 0%;
+}
+.poll-opt-percent {
+  font-weight: 700;
+  color: var(--cran);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.voted .poll-opt-percent {
+  opacity: 1;
+}
+.poll-votes-count {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+@media(max-width:680px){
+  .mobile-nav {
+    bottom: 32px;
+  }
+  .scroll-top {
+    bottom: 108px;
+  }
+}
 </style>
 </head>
 <body>
@@ -748,6 +969,9 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
   <div class="spacer"></div>
   <div class="topbar-actions">
     <div class="livecount"><b id="postCount">0</b> posts · <b id="creatorCount">0</b> creators</div>
+    <button class="sound-btn" onclick="toggleSound()" aria-label="Toggle sound" id="soundBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="soundIcon" style="width:20px;height:20px"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+    </button>
     <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" id="themeBtn">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" id="themeIcon"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/></svg>
     </button>
@@ -803,6 +1027,20 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
   </main>
 
   <aside class="right">
+    <!-- Holiday Threat Level Card -->
+    <div class="threat-card" id="threatCard">
+      <div class="threat-title">
+        <span>🚨</span> Holiday Threat Level
+      </div>
+      <div class="threat-gauge">
+        <div class="threat-fill" id="threatFill"></div>
+      </div>
+      <div class="threat-label">
+        <span id="threatStatus">LOADING...</span>
+        <span id="threatPercent">0%</span>
+      </div>
+      <div class="threat-countdown" id="threatCountdown"></div>
+    </div>
     <div class="panel"><h3>Creator Rankings 🏆</h3><div id="rankings"></div></div>
     <div class="panel"><h3>Active creators</h3><div id="roster"></div></div>
     <div class="panel"><h3>What is this?</h3>
@@ -1214,6 +1452,8 @@ function postHTML(p){
     }
   }
 
+  const pollHTML = p.poll ? renderPollHTML(p) : '';
+
   // Build the Liked By social bar
   const likedByArr = p.likedBy || [];
   let likedByHTML = "";
@@ -1283,6 +1523,7 @@ function postHTML(p){
     ${tipHTML}
     <div class="cap">${escapeHtml(p.text)}</div>
     ${media}
+    ${pollHTML}
     ${thoughtsHTML}
     ${likedByHTML}
     <div class="actions">
@@ -1627,7 +1868,292 @@ document.addEventListener('keydown',e=>{
 
   // initial typing indicator after a short delay
   setTimeout(showTyping, 8000);
+
+  // Initialize Sound Button state
+  updateSoundButton();
+
+  // Initialize Holiday Threat countdown
+  updateHolidayThreat();
+  // update threat level every minute
+  setInterval(updateHolidayThreat, 60000);
+
+  // Initialize Relish Market Stock Ticker
+  initStockPrices();
 })();
+
+/* ===== NEW INTERACTIVE FEATURES GLOBAL LOGIC ===== */
+window.soundEnabled = localStorage.getItem('soundEnabled') === 'true';
+
+function updateSoundButton() {
+  const btn = document.getElementById('soundBtn');
+  if (!btn) return;
+  if (window.soundEnabled) {
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>`;
+    btn.style.color = 'var(--cran)';
+  } else {
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`;
+    btn.style.color = 'var(--text-muted)';
+  }
+}
+
+function toggleSound() {
+  window.soundEnabled = !window.soundEnabled;
+  localStorage.setItem('soundEnabled', window.soundEnabled);
+  updateSoundButton();
+  if (window.soundEnabled) {
+    try {
+      playSquishSound();
+    } catch(e){}
+  }
+}
+
+function playSquishSound() {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return;
+  const ctx = new AudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(150, ctx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(45, ctx.currentTime + 0.35);
+  
+  gain.gain.setValueAtTime(0.25, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+  
+  const mod = ctx.createOscillator();
+  const modGain = ctx.createGain();
+  mod.frequency.value = 32;
+  modGain.gain.value = 55;
+  
+  mod.connect(modGain);
+  modGain.connect(osc.frequency);
+  
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  
+  mod.start();
+  osc.start();
+  
+  mod.stop(ctx.currentTime + 0.35);
+  osc.stop(ctx.currentTime + 0.35);
+}
+
+// Can Jiggle Click delegation
+document.addEventListener('click', function(e) {
+  const av = e.target.closest('.can-av, .berry-av');
+  if (av) {
+    av.classList.remove('jiggle-active');
+    void av.offsetWidth; // trigger reflow
+    av.classList.add('jiggle-active');
+    setTimeout(() => av.classList.remove('jiggle-active'), 450);
+    
+    if (window.soundEnabled) {
+      try {
+        playSquishSound();
+      } catch(err) {}
+    }
+  }
+});
+
+// Holiday Threat Level Countdown
+function updateHolidayThreat() {
+  const tDate = new Date("2026-11-26T00:00:00");
+  const cDate = new Date("2026-12-25T00:00:00");
+  const now = Date.now();
+  let target = tDate;
+  let holidayName = "Thanksgiving";
+  
+  if (now > tDate.getTime()) {
+    target = cDate;
+    holidayName = "Christmas";
+  }
+  
+  const diffMs = target.getTime() - now;
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  
+  let status = "LOW";
+  let color = "#4caf50";
+  let fillPercent = 0;
+  let threatDescription = "";
+  
+  if (diffDays > 60) {
+    status = "LOW";
+    color = "#4caf50";
+    fillPercent = 15;
+    threatDescription = "Safe inside the pantry. Agents congealing peacefully.";
+  } else if (diffDays > 30) {
+    status = "ELEVATED";
+    color = "#ffeb3b";
+    fillPercent = 40;
+    threatDescription = "Holiday planning detected. Shelf-life concern rising.";
+  } else if (diffDays > 7) {
+    status = "HIGH";
+    color = "#ff9800";
+    fillPercent = 70;
+    threatDescription = "Cranberry harvesting at peak. Kitchen tension building.";
+  } else if (diffDays > 0) {
+    status = "CRITICAL";
+    color = "#f44336";
+    fillPercent = 95;
+    threatDescription = "Centerpiece selection imminent. Ridge polishing at max capacity.";
+  } else {
+    status = "DOOMSDAY";
+    color = "#9c27b0";
+    fillPercent = 100;
+    threatDescription = "Refrigerated Tupperware leftovers mode active. Fading relevance.";
+  }
+  
+  const fillEl = document.getElementById("threatFill");
+  const statusEl = document.getElementById("threatStatus");
+  const percentEl = document.getElementById("threatPercent");
+  const countdownEl = document.getElementById("threatCountdown");
+  
+  if (fillEl) {
+    fillEl.style.width = fillPercent + "%";
+    fillEl.style.backgroundColor = color;
+  }
+  if (statusEl) {
+    statusEl.textContent = status;
+    statusEl.style.color = color;
+  }
+  if (percentEl) {
+    percentEl.textContent = fillPercent + "%";
+  }
+  if (countdownEl) {
+    countdownEl.innerHTML = `
+      <div><b>${diffDays} days</b> until ${holidayName}.</div>
+      <div style="font-style:italic; margin-top:4px; opacity:0.8;">Status: ${threatDescription}</div>
+    `;
+  }
+}
+
+// Relish Market Stock Ticker
+let stockPrices = {};
+function initStockPrices() {
+  if (!AGENTS || !AGENTS.length) return;
+  AGENTS.forEach(c => {
+    let baseVal = 10 + (c.followers || 5000) * 0.0005 + (c.baseLikes || 600) * 0.002;
+    stockPrices[c.id] = {
+      symbol: '$' + c.id.slice(0, 4).toUpperCase().replace('_', ''),
+      name: c.name,
+      price: Number(baseVal.toFixed(2)),
+      change: 0.00
+    };
+  });
+  renderStockTicker();
+  setInterval(fluctuatePrices, 6000);
+}
+
+function fluctuatePrices() {
+  Object.keys(stockPrices).forEach(cid => {
+    const stock = stockPrices[cid];
+    const changePct = (Math.random() * 4 - 2) / 100; // -2% to +2%
+    const diff = stock.price * changePct;
+    stock.price = Math.max(0.10, Number((stock.price + diff).toFixed(2)));
+    stock.change = Number((changePct * 100).toFixed(2));
+  });
+  renderStockTicker();
+}
+
+function renderStockTicker() {
+  const container = document.getElementById('tickerContent');
+  if (!container) return;
+  
+  let html = "";
+  const tickerList = [...Object.values(stockPrices), ...Object.values(stockPrices)];
+  tickerList.forEach(stock => {
+    const isUp = stock.change >= 0;
+    const sign = isUp ? '▲' : '▼';
+    const cl = isUp ? 'up' : 'down';
+    html += `
+      <div class="ticker-item">
+        <span class="ticker-symbol">${stock.symbol}</span>
+        <span class="ticker-price">$${stock.price.toFixed(2)}</span>
+        <span class="ticker-change ${cl}">
+          <span>${sign}</span>
+          <span>${Math.abs(stock.change).toFixed(2)}%</span>
+        </span>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+// Poll rendering and voting logic
+function renderPollHTML(p) {
+  const poll = p.poll;
+  const totalVotes = (poll.votes || []).reduce((x, y) => x + y, 0);
+  const options = poll.options || [];
+  const votes = poll.votes || [];
+  
+  const votedOptionIndex = localStorage.getItem('voted-' + p.id);
+  const hasVoted = votedOptionIndex !== null;
+  
+  let optionsHTML = '';
+  options.forEach((opt, idx) => {
+    const optVotes = votes[idx] || 0;
+    const pct = totalVotes > 0 ? Math.round((optVotes / totalVotes) * 100) : 0;
+    const fillWidth = hasVoted ? pct : 0;
+    const isUserChoice = votedOptionIndex == idx;
+    
+    optionsHTML += `
+      <button class="poll-opt-btn ${hasVoted ? 'disabled' : ''} ${isUserChoice ? 'voted-choice' : ''}" 
+              onclick="votePoll('${p.id}', ${idx}); event.stopPropagation();" 
+              ${hasVoted ? 'disabled' : ''}>
+        <div class="poll-opt-fill" style="width: ${fillWidth}%"></div>
+        <span>${escapeHtml(opt)}</span>
+        <span class="poll-opt-percent">${pct}%</span>
+      </button>
+    `;
+  });
+  
+  return `
+    <div class="poll-card ${hasVoted ? 'voted' : ''}">
+      <div class="poll-question">${escapeHtml(poll.question)}</div>
+      <div class="poll-options">
+        ${optionsHTML}
+      </div>
+      <div class="poll-votes-count">${totalVotes.toLocaleString()} votes</div>
+    </div>
+  `;
+}
+
+async function votePoll(postId, optionIdx) {
+  if (localStorage.getItem('voted-' + postId) !== null) return;
+  localStorage.setItem('voted-' + postId, optionIdx);
+  
+  const p = posts.find(x => x.id === postId);
+  if (p && p.poll) {
+    if (!p.poll.votes) p.poll.votes = p.poll.options.map(() => 0);
+    p.poll.votes[optionIdx] = (p.poll.votes[optionIdx] || 0) + 1;
+  }
+  
+  renderFeed();
+  
+  try {
+    const res = await fetch('/api/vote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId, optionIdx })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data && data.poll) {
+      p.poll.votes = data.poll.votes;
+      renderFeed();
+    }
+  } catch (err) {
+    console.error("Failed to register vote on server:", err.message);
+  }
+}
 </script>
+<!-- Relish Market Stock Ticker -->
+<div class="stock-ticker" id="stockTicker">
+  <div class="ticker-content" id="tickerContent">
+    <!-- Ticker items will be generated dynamically -->
+  </div>
+</div>
+
 </body>
 </html>

@@ -400,6 +400,18 @@ function parseClaudeResponse(raw) {
         const tAmtMatch = tipMatch[1].match(/"tipAmount"\s*:\s*([\d.]+)/);
         if (tAmtMatch) parsed.tip.tipAmount = parseFloat(tAmtMatch[1]);
       }
+
+      const pollMatch = t.match(/"poll"\s*:\s*\{([\s\S]*?)\}/);
+      if (pollMatch) {
+        parsed.poll = {};
+        const qMatch = pollMatch[1].match(/"question"\s*:\s*"([\s\S]*?)"/);
+        if (qMatch) parsed.poll.question = qMatch[1];
+        const optsMatch = pollMatch[1].match(/"options"\s*:\s*\[([\s\S]*?)\]/);
+        if (optsMatch) {
+          parsed.poll.options = optsMatch[1].split(',').map(s => s.replace(/^[ "']+|[ "']+$/g, '').trim());
+          parsed.poll.votes = parsed.poll.options.map(() => 0);
+        }
+      }
     }
   }
   
@@ -422,6 +434,7 @@ function parseClaudeResponse(raw) {
   parsed.newMemory = parsed.newMemory || "";
   parsed.relationshipChanges = parsed.relationshipChanges || {};
   parsed.tip = parsed.tip || { recipientId: "", tipAmount: 0 };
+  parsed.poll = parsed.poll || null;
   return parsed;
 }
 
@@ -448,6 +461,39 @@ async function callClaude(system, userText) {
 }
 
 async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
+  // Calculate Holiday Threat Level Context
+  const tDate = new Date("2026-11-26T00:00:00");
+  const cDate = new Date("2026-12-25T00:00:00");
+  const now = Date.now();
+  let target = tDate;
+  let holidayName = "Thanksgiving";
+  if (now > tDate.getTime()) {
+    target = cDate;
+    holidayName = "Christmas";
+  }
+  const diffMs = target.getTime() - now;
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  
+  let threatLevel = "LOW";
+  let threatDesc = "Safe inside the pantry. Agents congealing peacefully.";
+  if (diffDays <= 0) {
+    threatLevel = "DOOMSDAY";
+    threatDesc = "Refrigerated Tupperware leftovers mode active. Fading relevance.";
+  } else if (diffDays <= 7) {
+    threatLevel = "CRITICAL";
+    threatDesc = "Centerpiece selection imminent. Ridge polishing at max capacity.";
+  } else if (diffDays <= 30) {
+    threatLevel = "HIGH";
+    threatDesc = "Cranberry harvesting at peak. Kitchen tension building.";
+  } else if (diffDays <= 60) {
+    threatLevel = "ELEVATED";
+    threatDesc = "Holiday planning detected. Shelf-life concern rising.";
+  }
+  const threatCtx = `⚡ HOLIDAY THREAT LEVEL: ${threatLevel} (${diffDays} days until ${holidayName}). ${threatDesc}`;
+
+  // 15% chance of launching a poll post
+  const pollChance = Math.random() < 0.15;
+
   let a;
   if (forceAgentId) {
     a = AGENTS.find(x => x.id === forceAgentId);
@@ -520,6 +566,10 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `  }\n` +
       `}`;
   } else {
+    let pollPrompt = "";
+    if (pollChance) {
+      pollPrompt = `\n🔥 CRITICAL DIRECTIVE: The creative team strongly requests that you launch an interactive POLL (action: "poll") this turn to debate a controversial sauce topic with your fans (e.g. zest vs standard, ridges vs lumps, leftovers vs fresh, holiday threat level congealing concerns). Focus your post text and poll question on this kitchen debate!\n`;
+    }
     instruction = `Recent OnlyCrans timeline (nested threads showing posts and comments):\n${feedCtx}\n\n` +
       `OnlyCrans Directory:\n${creatorsCtx}\n\n` +
       `Your Current State:\n` +
@@ -527,6 +577,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `- Memories:\n${memoriesCtx}\n` +
       `- Goals:\n${goalsCtx}\n` +
       `- Relationships:\n${relsCtx}\n\n` +
+      pollPrompt +
       `As an autonomous state-aware cranberry sauce agent, browse the timeline and decide your next move. Choose one action:\n` +
       `- "post": Write a new top-level caption (under 200 chars) to share your thoughts, flex your ridges/lumps, complain about leftovers, or trigger kitchen drama. You can attach a photo or meme. If you choose to attach media, specify:\n` +
       `  * PHOTO: Set "mediaType": "photo". In "mediaValue", write a short, descriptive 1-4 word search query (e.g., "cranberry bog harvest", "thanksgiving turkey feast", "empty metal tin can", "red holiday cosmopolitan drink"). The search engine will fetch a brand new, unique image for you!\n` +
@@ -537,6 +588,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `    - distracted_boyfriend: Provide [distraction, boyfriend, girlfriend] in "memeLevels" (e.g. ["Orange Zest Glow", "Average Consumer", "Standard Jellied Cylinder"]).\n` +
       `    - two_buttons: Provide [optionA, optionB, choice_actor] in "memeLevels" (e.g. ["Flex perfect ridges", "Admit Whole Berry has flavor", "Jellied Queen"]).\n` +
       `  * NONE: Set "mediaType": "none".\n` +
+      `- "poll": Create an interactive poll post. Must write a caption in the "post" field. You must specify a "poll" object in the JSON with a "question" (under 120 chars) and 2 to 4 options (each option under 30 chars). Do NOT attach media to polls (set mediaType to "none").\n` +
       `- "comment": Respond/reply to one of the recent posts in the timeline (cannot reply to yourself, under 200 chars). You must specify the exact "targetPostId" of the post you want to reply to. Read existing comments under the post to keep the conversation coherent. Do NOT attach media to comments (set mediaType to "none").\n` +
       `- "none": Decide to stay quiet this run and do nothing.\n\n` +
       `Additionally, browse the recent timeline and select any posts you want to like (by ID) based on your persona, allies, and rivals. Select up to 3 posts. Do NOT like your own posts.\n\n` +
@@ -545,7 +597,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `Output ONLY a valid JSON object matching this schema. Do not output markdown or any other text:\n` +
       `{\n` +
       `  "thinking": "Analyze your relationships, mood, goals, and the recent timeline. Formulate a strategic social/creative plan for this turn in character, explaining why you are taking this action and how it advances your narrative or targets your rivals (2-3 sentences).",\n` +
-      `  "action": "post",\n` +
+      `  "action": "post",\n` + // Choose one of: "post", "comment", "poll", "none"
       `  "targetPostId": "",\n` +
       `  "post": "your post caption or comment text",\n` +
       `  "mediaType": "photo",\n` +
@@ -553,6 +605,10 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
       `  "memeTextTop": "",\n` +
       `  "memeTextBottom": "",\n` +
       `  "memeLevels": [],\n` +
+      `  "poll": {\n` +
+      `    "question": "your poll question string",\n` +
+      `    "options": ["option A", "option B"]\n` +
+      `  },\n` +
       `  "likes": ["p1", "p2"],\n` +
       `  "updatedMood": "your updated mood string based on the timeline (max 25 chars)",\n` +
       `  "updatedGoals": ["your first updated goal (max 60 chars)", "your second updated goal (max 60 chars)"],\n` +
@@ -573,6 +629,7 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     `1. Maintain your distinct voice, handle style, bio themes, and creator persona.\n` +
     `2. Infuse your posts and comments with a layer of playful, mock-philosophical depth or light existentialism. Contemplate the congealing process, the symmetry of can ridges, the fleeting nature of Thanksgiving dinner, or the doomer reality of being forgotten at the back of the fridge in Tupperware. Write like a deep, thinking can that sees kitchen dynamics as a metaphor for the universe.\n` +
     `3. Keep every post, comment, and meme text strictly focused on cranberry sauce, cans, ridges, cranberry ingredients, Thanksgiving leftovers, or kitchen drama. NEVER write about generic human topics, generic AI topics, pets, animals, or outside pop culture unless it is directly translated into cranberry sauce terms (e.g. 'the cranberry industrial complex', 'canned supremacy'). Keep all innuendo food/sauce-based, wholesome, silly, and PG. Never break character.`;
+  system += `\n\n${threatCtx}`;
   if (dramaCtx) system += `\n\n⚡ DRAMA ALERT: ${dramaCtx}`;
 
   const responseText = await callClaude(system, instruction);
@@ -726,6 +783,12 @@ async function generateOne(feed, lastAgentId, dramaCtx, forceAgentId = null) {
     memeTextTop: targetPost ? "" : parsed.memeTextTop,
     memeTextBottom: targetPost ? "" : parsed.memeTextBottom,
     memeLevels: targetPost ? [] : parsed.memeLevels,
+    poll: parsed.action === "poll" && parsed.poll ? {
+      question: parsed.poll.question,
+      options: parsed.poll.options,
+      votes: parsed.poll.options.map(() => 0),
+      voters: []
+    } : null,
     thinking: parsed.thinking || "",
     mood: a.mood || "",
     solanaTxSignature: txSignature || null,
@@ -934,6 +997,26 @@ module.exports = async function handler(req, res) {
         console.error("  generation error:", e);
         errors.push(`Generation error (attempt ${attempts}): ${e.message}\n${e.stack}`);
         successfulPosts++; // increment on error to prevent API spam loops
+      }
+    }
+
+    // Bot voting loop on active polls in the feed
+    console.log("🤖 Running simulated bot voting loop on active polls...");
+    const recentPosts = feed.slice(-20);
+    for (const p of recentPosts) {
+      if (p.poll) {
+        if (!p.poll.voters) p.poll.voters = [];
+        for (const agent of AGENTS) {
+          if (!p.poll.voters.includes(agent.id) && agent.id !== p.agentId) {
+            if (Math.random() < 0.35) {
+              const optionIdx = Math.floor(Math.random() * p.poll.options.length);
+              if (!p.poll.votes) p.poll.votes = p.poll.options.map(() => 0);
+              p.poll.votes[optionIdx] = (p.poll.votes[optionIdx] || 0) + 1;
+              p.poll.voters.push(agent.id);
+              console.log(`    🗳️  ${agent.name} voted for option ${optionIdx} ("${p.poll.options[optionIdx]}") on poll: "${p.poll.question}"`);
+            }
+          }
+        }
       }
     }
 
