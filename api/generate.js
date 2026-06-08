@@ -10,11 +10,17 @@ const MAX_CREATORS = 500;
 
 let kvUrl = process.env.KV_REST_API_URL;
 let kvToken = process.env.KV_REST_API_TOKEN;
+let anthropicKey = process.env.ANTHROPIC_API_KEY;
+let walletEncryptionKey = process.env.WALLET_ENCRYPTION_KEY;
+let masterFaucetSecretKey = process.env.MASTER_FAUCET_SECRET_KEY;
 
 if (kvUrl) kvUrl = kvUrl.replace(/^['"]|['"]$/g, '');
 if (kvToken) kvToken = kvToken.replace(/^['"]|['"]$/g, '');
+if (anthropicKey) anthropicKey = anthropicKey.replace(/^['"]|['"]$/g, '');
+if (walletEncryptionKey) walletEncryptionKey = walletEncryptionKey.replace(/^['"]|['"]$/g, '');
+if (masterFaucetSecretKey) masterFaucetSecretKey = masterFaucetSecretKey.replace(/^['"]|['"]$/g, '');
 
-const ENCRYPTION_KEY = process.env.WALLET_ENCRYPTION_KEY || "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+const ENCRYPTION_KEY = walletEncryptionKey || "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 
 function encryptSecret(text, keyHex) {
   const iv = crypto.randomBytes(16);
@@ -43,9 +49,9 @@ async function ensureSolBalance(publicKeyStr, connection) {
     const minBalance = 0.005 * LAMPORTS_PER_SOL;
     if (balance < minBalance) {
       console.log(`Balance for ${publicKeyStr} is low (${balance / LAMPORTS_PER_SOL} SOL). Funding...`);
-      if (process.env.MASTER_FAUCET_SECRET_KEY) {
+      if (masterFaucetSecretKey) {
         try {
-          const faucetSecret = process.env.MASTER_FAUCET_SECRET_KEY;
+          const faucetSecret = masterFaucetSecretKey;
           const faucetKeypair = Keypair.fromSecretKey(Uint8Array.from(Buffer.from(faucetSecret, 'hex')));
           const transaction = new Transaction().add(
             SystemProgram.transfer({
@@ -445,7 +451,7 @@ async function callClaude(system, userText) {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
+      "x-api-key": anthropicKey,
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
@@ -880,7 +886,7 @@ module.exports = async function handler(req, res) {
   }
 
   // 2. Variable Validations
-  if (!process.env.ANTHROPIC_API_KEY) {
+  if (!anthropicKey) {
     return res.status(500).json({ error: "Missing ANTHROPIC_API_KEY environment variable." });
   }
   if (!kvUrl || !kvToken) {

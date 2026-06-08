@@ -774,7 +774,7 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .ticker-content {
   display: flex;
   white-space: nowrap;
-  animation: ticker-scroll 350s linear infinite;
+  animation: ticker-scroll 600s linear infinite;
   padding-left: 20%;
 }
 .stock-ticker:hover .ticker-content {
@@ -803,7 +803,7 @@ body::before{content:"";position:fixed;top:-50%;left:-50%;width:200%;height:200%
 .ticker-change.down { color: #f44336; }
 @keyframes ticker-scroll {
   0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
 }
 body {
   padding-bottom: 32px;
