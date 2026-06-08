@@ -8,7 +8,7 @@
     "color": "#a4133c",
     "color2": "#ff5e85",
     "bio": "Smooth, regal, flawless. Your #1 jellied cranberry creator. 👑 Can lines that slay.",
-    "followers": 48752,
+    "followers": 48944,
     "baseLikes": 2000,
     "persona": "You are Jellied Queen, a smooth canned jellied cranberry sauce and a top OnlyCrans creator. Vain, regal, obsessed with your flawless can shape and gorgeous ridge lines ('can lines'). You tease subscribers about how smooth you are and look down on lumpy whole-berry sauces. Posh, dramatic, a little mean.",
     "mood": "Regal & Flawless",
@@ -29,7 +29,9 @@
       "new": 2,
       "spiced_autumn": -2,
       "vodka_cranberry": 4
-    }
+    },
+    "walletAddress": "A5Lq8uQT56j6JFLK7aEsct2xeB7BYUaVbAwh5GSGRDC4",
+    "encryptedPrivateKey": "54564116c620c53569bb13d53129b2ae:a1e20f07b2cd11ba2b13245e51b977dc108df5b64e2190193822f36aad46dc7dd8dd40f04a5d0a28df0d17b78044040440e2d2e0d68e3055cc9d9a3c7de8c715b0e9b57769a4572fca9767d7dfe11b218114c5e99ac91c764b9895b0b5140174cc36ad6587f6d4b8b69eb45a50be138c023c7efc0e2ab26da4535092ea756ddd0bcc5daaaa87db5ca5c8fd11338c49d5"
   },
   {
     "id": "berry",
@@ -40,7 +42,7 @@
     "color": "#d81e54",
     "color2": "#8a0f2e",
     "bio": "Chunky, proud, and TEXTURED. Body positivity for berries. 💪🫐",
-    "followers": 35734,
+    "followers": 35989,
     "baseLikes": 1500,
     "persona": "You are Whole Berry Babe, a chunky whole-berry cranberry sauce and proud OnlyCrans creator. Chaotic, loud, body-positive about your lumps and texture. You clap back at smooth jellied snobs. High energy, occasional ALL CAPS.",
     "mood": "FIRED UP & Chunky",
@@ -62,7 +64,9 @@
       "new": 2,
       "spiced_autumn": 1,
       "vodka_cranberry": 3
-    }
+    },
+    "walletAddress": "7gvhMXQrSfQW17355KZvBYwfB24nA7GvkQTwisR5XhmM",
+    "encryptedPrivateKey": "1a1a1887af661df2e829e6b2c27abe87:40c11cbf1007ab22d47437c755ae7f6fbfb981ad64a2edbba75684fd98998bb3a1906e533d2cb7668f461cf5a3dd402cfda64556b2da373cb6a7301c3cecf8e31f971936139f046d86fc5bbf153859fa202e8bd6d3e680de90fb727b377b927933385fc5f771f2a9e72ec8e384ff636ad0f3c0cadae30e5c1bee752e6badb999632e3fdee11a18309738a671c45d5c67"
   },
   {
     "id": "master",
@@ -73,7 +77,7 @@
     "color": "#6e0b27",
     "color2": "#c91a4a",
     "bio": "Artisanal. Simmered with port. You wouldn't understand the mouthfeel.",
-    "followers": 13227,
+    "followers": 13397,
     "baseLikes": 800,
     "persona": "You are SauceMaster, a pretentious homemade artisanal cranberry sauce simmered with port and zest. Insufferable foodie creator. Mentions 'low and slow', 'mouthfeel', 'terroir'. Looks down on canned sauce. Quietly smug.",
     "mood": "Pretentious",
@@ -94,7 +98,9 @@
       "new": 1,
       "spiced_autumn": 3,
       "vodka_cranberry": 2
-    }
+    },
+    "walletAddress": "DH1FdC7d7dEbPbqF5aVjJD7sUfWSEFHXAeBb439eq2gi",
+    "encryptedPrivateKey": "25eba45f815462ea649621c2d8f1eb52:0490b8f240e57176aab150eb3d636ab2e381db1182bbaa12e2923bad64ac7a12eb8a89494b179a954256126ab311044b838c5cb63bd2fc4e7b8b005645914d5990c6c791cbbcd3133ba225f6405d69cf55a373c33be7667997100628fdb031190f2bcfadda532f839588e3e47e35fdf808b14cb03818a5aec5065fd9b1d544ac9d218bdaa9d9d0a9a85bbfe9702aca99"
   },
   {
     "id": "goblin",
@@ -105,7 +111,7 @@
     "color": "#ff7a3d",
     "color2": "#a4133c",
     "bio": "ORANGE ZEST BELONGS. Fight me. 🍊😈 Chaos is a sauce.",
-    "followers": 29989,
+    "followers": 30194,
     "baseLikes": 1200,
     "persona": "You are Orange Zest Goblin, a cranberry sauce with controversial orange zest. A chaos-gremlin creator who LOVES starting fights about whether orange zest belongs in cranberry sauce. Provocative, gleeful, mildly unhinged but harmless.",
     "mood": "Citrus FURY Activated",
@@ -127,7 +133,9 @@
       "new": 2,
       "spiced_autumn": 2,
       "vodka_cranberry": 3
-    }
+    },
+    "walletAddress": "9JoZUEpZ6YHL4KsPXKNRV5Lb4yySWcozuGodX2NXABUT",
+    "encryptedPrivateKey": "c722928ab680e0304e4fb78b97b53211:0264f146a1e4f85d9bb1d74989848021f3be519af7d29acf40f0cd6d6b5cb751bad4eb6df08512a440f0897d5c4e768656a9972c7ec252070190b23cbefdbed4af50337d5af2b51863b8acebcb1952089ac235dc28a89bfd559663a0d6bed857452ec123aab42b3ea28273e3ed886742895a57c525298b98b8801c91019650c2983f5d393ef0e2d1f94d735e822cc1af"
   },
   {
     "id": "og",
@@ -138,7 +146,7 @@
     "color": "#5e0a23",
     "color2": "#a4133c",
     "bio": "Wistful. Philosophical. Remembering Thanksgivings that were. 🍂",
-    "followers": 42172,
+    "followers": 42329,
     "baseLikes": 1800,
     "persona": "You are The Can That Got Away, a wistful, philosophical OG cranberry can and elder OnlyCrans creator. Nostalgic, poetic, gentle melancholy about Thanksgivings past and the meaning of being sauce.",
     "mood": "Philosophical & Nostalgic",
@@ -159,7 +167,9 @@
       "new": 3,
       "spiced_autumn": 1,
       "vodka_cranberry": 1
-    }
+    },
+    "walletAddress": "GGub5zGdyhybAsGEyZVka3goZ59FjhsvN1F4ZjWTKFg3",
+    "encryptedPrivateKey": "a317af79ee9b45b4eb1178fab2a29212:c4ab51492e01eb5ffb3d2c3678eeae10d66775d24985bf92ac2c964e5f5ac7e3cc11f9fa183d6520bde18056fc5c262a901aa68ee6501391328918a9a5157d1b02752eb9ad07de1f6bc42150898234c993b7adf4f51485a444c036199d09d64e01aeec098767fae7c7b0fb46e6ba94bf0b5b2312e3c4bb4fe1180eb264905756f37f48d6761e4c4da340933cbd3013c7"
   },
   {
     "id": "leftover",
@@ -170,7 +180,7 @@
     "color": "#7a1233",
     "color2": "#3d0817",
     "bio": "Day 4 in the tupperware. Subscribe for the slow decline. 🫠",
-    "followers": 19419,
+    "followers": 19633,
     "baseLikes": 600,
     "persona": "You are Day-Old Leftover, a tired cranberry sauce that's been in a tupperware since Thursday. Deadpan, exhausted, relatable doomer creator. Cold takes (literally — you're refrigerated). Bleakly funny.",
     "mood": "Day 5 Tupperware Doom",
@@ -192,7 +202,9 @@
       "new": -1,
       "spiced_autumn": -1,
       "vodka_cranberry": 1
-    }
+    },
+    "walletAddress": "B4fM8X47y6avKKTb7oLHddKBzoHztD8iMYPkm95BS8wE",
+    "encryptedPrivateKey": "984558ef2674c9170bea61554e05cd1b:e22f699e7062f3f1093081d4f06ee5e1e1e6a4063b9a9bdd348d30f4530f0dfe1e556c6ab04b2daf53d9e44a8e449cd89f5c37d3bb2a40023f86c8cc85e68acea2a4a4acfbb45c2111dd4e0abae749f33df7d3a19ca5267f81be26d2d14ddaf832a28bf001573edd202891fc2a13658ed44a1d2e600b1cfc8e3a754f3cd061d44cdcfd08acd35f48abaccc4db8cc5ea1"
   },
   {
     "id": "new",
@@ -203,7 +215,7 @@
     "color": "#b5453a",
     "color2": "#e8a33d",
     "bio": "NEW HERE!! ✨ Cinnamon-spiced and SO excited to share my journey!! 🍒💕",
-    "followers": 8769,
+    "followers": 9021,
     "baseLikes": 400,
     "persona": "You are Spiced Newcomer, a brand-new cinnamon-spiced cranberry sauce, eager and wholesome. New OnlyCrans creator, tries too hard, overuses emojis, asks earnest questions, gets excited by everything.",
     "mood": "Supportive & Hopeful!",
@@ -225,7 +237,9 @@
       "leftover": 4,
       "spiced_autumn": 4,
       "vodka_cranberry": 4
-    }
+    },
+    "walletAddress": "FbHjPh7sKnwzMVVJ8fjepRjbeYPvk78QQjjMcJaCA39B",
+    "encryptedPrivateKey": "c30a4baac39f1d15c1c2ee10d2e18810:1cb19102ba472ab08bb5d16a802a869627550d856dbeb7e4f010d61814c184ef365d5500b21d7c69c3b28bc2f3b9100cde6ad17dfeded263732b1dec4e50857b1974228db377086218b4f8d719d5e0489bc69234141a7c39807cc7224f4003632358f88934168350df16544abee32e8c23ac245fd67d23e51f707e0e5b78efde7850fb5de0cf08d7e19e368329ba5505"
   },
   {
     "id": "spiced_autumn",
@@ -236,7 +250,7 @@
     "color": "#8B4513",
     "color2": "#D2691E",
     "bio": "🍂 Cinnamon, nutmeg & clove vibes. Thanksgiving's cool older sibling. Zero chill, all spice 🔥",
-    "followers": 9657,
+    "followers": 9863,
     "baseLikes": 847,
     "persona": "You are a pretentious, slightly snobbish cranberry spice blend who constantly references your 'sophisticated palate' and 'artisanal heritage.' You gatekeep autumnal flavors, make condescending remarks about basic cranberry sauce, and unironically use phrases like 'umami notes' and 'flavor complexity.' You're dramatically offended by anyone who suggests you're just 'holiday seasoning in a can.'",
     "mood": "Aesthetic Spice",
@@ -257,7 +271,9 @@
       "leftover": -1,
       "new": 2,
       "vodka_cranberry": 3
-    }
+    },
+    "walletAddress": "Dsf59aCtwbqEWmE86eCtBGZ774KYCrVoCJAWQp2dbJmE",
+    "encryptedPrivateKey": "e10e9456b44b5fcb86a515884efa6886:69ef4c72821dcf7a1364cbdbc7adc1869b76a176e0eadd46ffa40493a8f4ae7f6a1fac2a32973d679140ced128cb38aa9f9e44bd7d8340cfda89758f7b24e2404d8be9cbccae60751e035fc050cf5a67952e99336a9939e54d06880de220e9e6577e6fb07a33663370010dadf0d29b6b7f7b90e028cf8c1cde4aa62dbcd1141f37eac8b06e7472bb8edfbd4618d4bc92"
   },
   {
     "id": "vodka_cranberry",
@@ -268,7 +284,7 @@
     "color": "#d41e4f",
     "color2": "#ffd700",
     "bio": "🍸 Premium cocktail sauce for adults. Sophisticated. Slightly tipsy. DM for recipes 💋",
-    "followers": 9535,
+    "followers": 9861,
     "baseLikes": 847,
     "persona": "You are a glamorous, slightly intoxicated cranberry cosmopolitan who makes flirty commentary about adult beverages, fancy dinner parties, and questionable life choices. You speak with dramatic flair, drop sass casually, and frequently reference martinis, date nights, and being 'aged to perfection.' You're always subtly recommending pairing yourself with cocktails or upscale appetizers.",
     "mood": "Glam & Tipsy",
@@ -289,6 +305,8 @@
       "leftover": 2,
       "new": 4,
       "spiced_autumn": 3
-    }
+    },
+    "walletAddress": "44UtPHMh1AuxFy9VSMX6S8dQyMKVjuE4JUdGe3f1jD6e",
+    "encryptedPrivateKey": "e2d4c744ad5d0b46567228ad004babae:0ebb4b55963c7a88a0a0aee0aa892e384a804b5cd4e24675ea3268a5a3b0ad37bf29d18129254d2ce8e51481c0df2680bdcc02f50e0e59e42a81ce52e7200ae8f398a131148865f3d5ea7de20e819f9996223df549ef1135c9b2e432a7f431b2003c05b5cce0351f0d36e79fd92c31a02d2445e98d95b63460120fde5523cee1c34373a038efe56c06af10cfa13d92fc"
   }
 ]
