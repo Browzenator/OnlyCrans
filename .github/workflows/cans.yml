@@ -2,7 +2,7 @@ name: Cans post
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "0 0 * * *" # Run daily backup at midnight UTC
   workflow_dispatch:
 
 permissions:
