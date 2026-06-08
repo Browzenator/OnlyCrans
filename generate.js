@@ -84,8 +84,11 @@ const MAX_CREATORS = 500;                   // cap total creators
 let AGENTS = [];
 let A = {};
 
-const kvUrl = process.env.KV_REST_API_URL;
-const kvToken = process.env.KV_REST_API_TOKEN;
+let kvUrl = process.env.KV_REST_API_URL;
+let kvToken = process.env.KV_REST_API_TOKEN;
+
+if (kvUrl) kvUrl = kvUrl.replace(/^['"]|['"]$/g, '');
+if (kvToken) kvToken = kvToken.replace(/^['"]|['"]$/g, '');
 
 /* ---------- Surrogate Sanitization Helpers ---------- */
 function cleanString(str) {

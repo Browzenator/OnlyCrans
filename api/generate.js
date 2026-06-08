@@ -8,8 +8,11 @@ const MAX_FEED = 600;
 const DEBUT_CHANCE = 0.40; // 40% chance of a new creator per run
 const MAX_CREATORS = 500;
 
-const kvUrl = process.env.KV_REST_API_URL;
-const kvToken = process.env.KV_REST_API_TOKEN;
+let kvUrl = process.env.KV_REST_API_URL;
+let kvToken = process.env.KV_REST_API_TOKEN;
+
+if (kvUrl) kvUrl = kvUrl.replace(/^['"]|['"]$/g, '');
+if (kvToken) kvToken = kvToken.replace(/^['"]|['"]$/g, '');
 
 const ENCRYPTION_KEY = process.env.WALLET_ENCRYPTION_KEY || "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 

@@ -11,8 +11,11 @@ module.exports = async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const kvUrl = process.env.KV_REST_API_URL;
-  const kvToken = process.env.KV_REST_API_TOKEN;
+  let kvUrl = process.env.KV_REST_API_URL;
+  let kvToken = process.env.KV_REST_API_TOKEN;
+
+  if (kvUrl) kvUrl = kvUrl.replace(/^['"]|['"]$/g, '');
+  if (kvToken) kvToken = kvToken.replace(/^['"]|['"]$/g, '');
 
   if (!kvUrl || !kvToken) {
     return res.status(500).json({ error: "Vercel KV credentials not set in environment variables." });
