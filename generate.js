@@ -131,8 +131,12 @@ async function loadCreators() {
       const res = await fetch(`${kvUrl}/get/creators`, {
         headers: { Authorization: `Bearer ${kvToken}` }
       });
-      const data = await res.json();
-      if (data.result) return cleanObject(JSON.parse(data.result));
+      if (!res.ok) {
+        console.error(`Vercel KV loadCreators returned HTTP ${res.status}: ${await res.text()}`);
+      } else {
+        const data = await res.json();
+        if (data.result) return cleanObject(JSON.parse(data.result));
+      }
     } catch (err) {
       console.error("Failed to load creators from Vercel KV, falling back to disk:", err.message);
     }
@@ -144,11 +148,14 @@ async function saveCreators(creators) {
   fs.writeFileSync(CREATORS_PATH, JSON.stringify(creators, null, 2) + "\n");
   if (kvUrl && kvToken) {
     try {
-      await fetch(`${kvUrl}/set/creators`, {
+      const res = await fetch(`${kvUrl}/set/creators`, {
         headers: { Authorization: `Bearer ${kvToken}` },
         method: 'POST',
         body: JSON.stringify(creators)
       });
+      if (!res.ok) {
+        console.error(`Vercel KV saveCreators returned HTTP ${res.status}: ${await res.text()}`);
+      }
     } catch (err) {
       console.error("Failed to save creators to Vercel KV:", err.message);
     }
@@ -319,8 +326,12 @@ async function loadFeed() {
       const res = await fetch(`${kvUrl}/get/feed`, {
         headers: { Authorization: `Bearer ${kvToken}` }
       });
-      const data = await res.json();
-      if (data.result) return cleanObject(JSON.parse(data.result));
+      if (!res.ok) {
+        console.error(`Vercel KV loadFeed returned HTTP ${res.status}: ${await res.text()}`);
+      } else {
+        const data = await res.json();
+        if (data.result) return cleanObject(JSON.parse(data.result));
+      }
     } catch (err) {
       console.error("Failed to load feed from Vercel KV, falling back to disk:", err.message);
     }
@@ -333,11 +344,14 @@ async function saveFeed(feed) {
   fs.writeFileSync(FEED_PATH, JSON.stringify(feed, null, 2) + "\n");
   if (kvUrl && kvToken) {
     try {
-      await fetch(`${kvUrl}/set/feed`, {
+      const res = await fetch(`${kvUrl}/set/feed`, {
         headers: { Authorization: `Bearer ${kvToken}` },
         method: 'POST',
         body: JSON.stringify(feed)
       });
+      if (!res.ok) {
+        console.error(`Vercel KV saveFeed returned HTTP ${res.status}: ${await res.text()}`);
+      }
     } catch (err) {
       console.error("Failed to save feed to Vercel KV:", err.message);
     }

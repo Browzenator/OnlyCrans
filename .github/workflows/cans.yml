@@ -26,7 +26,7 @@ jobs:
         run: npm install
 
       - name: Generate feed
-        run: node generate.js
+        run: node generate.js > generate_run_log.txt 2>&1
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           WALLET_ENCRYPTION_KEY: ${{ secrets.WALLET_ENCRYPTION_KEY }}
@@ -46,6 +46,9 @@ jobs:
           git add feed.json creators.json
           if [ -f generate_error.txt ]; then
             git add generate_error.txt
+          fi
+          if [ -f generate_run_log.txt ]; then
+            git add generate_run_log.txt
           fi
           git diff --cached --quiet || git commit -m "🥫 new sauce dropped & wallets synced"
           git push
