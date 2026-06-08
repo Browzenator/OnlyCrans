@@ -31,6 +31,8 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           WALLET_ENCRYPTION_KEY: ${{ secrets.WALLET_ENCRYPTION_KEY }}
           MASTER_FAUCET_SECRET_KEY: ${{ secrets.MASTER_FAUCET_SECRET_KEY }}
+          KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
+          KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
 
       - name: Commit and push feed
         run: |

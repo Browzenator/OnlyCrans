@@ -84,12 +84,75 @@ const MAX_CREATORS = 500;                   // cap total creators
 let AGENTS = [];
 let A = {};
 
-function loadCreators() {
+const kvUrl = process.env.KV_REST_API_URL;
+const kvToken = process.env.KV_REST_API_TOKEN;
+
+/* ---------- Surrogate Sanitization Helpers ---------- */
+function cleanString(str) {
+  if (typeof str !== 'string') return str;
+  let result = "";
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    if (code >= 0xD800 && code <= 0xDBFF) {
+      if (i + 1 < str.length) {
+        const nextCode = str.charCodeAt(i + 1);
+        if (nextCode >= 0xDC00 && nextCode <= 0xDFFF) {
+          result += str[i] + str[i+1];
+          i++;
+        }
+      }
+    } else if (code >= 0xDC00 && code <= 0xDFFF) {
+      // Skip unpaired low surrogate
+    } else {
+      result += str[i];
+    }
+  }
+  return result;
+}
+
+function cleanObject(obj) {
+  if (typeof obj === 'string') {
+    return cleanString(obj);
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(cleanObject);
+  }
+  if (obj && typeof obj === 'object') {
+    for (const key of Object.keys(obj)) {
+      obj[key] = cleanObject(obj[key]);
+    }
+  }
+  return obj;
+}
+
+async function loadCreators() {
+  if (kvUrl && kvToken) {
+    try {
+      const res = await fetch(`${kvUrl}/get/creators`, {
+        headers: { Authorization: `Bearer ${kvToken}` }
+      });
+      const data = await res.json();
+      if (data.result) return cleanObject(JSON.parse(data.result));
+    } catch (err) {
+      console.error("Failed to load creators from Vercel KV, falling back to disk:", err.message);
+    }
+  }
   try { return JSON.parse(fs.readFileSync(CREATORS_PATH, "utf8")) || []; }
   catch { return []; }
 }
-function saveCreators(creators) {
+async function saveCreators(creators) {
   fs.writeFileSync(CREATORS_PATH, JSON.stringify(creators, null, 2) + "\n");
+  if (kvUrl && kvToken) {
+    try {
+      await fetch(`${kvUrl}/set/creators`, {
+        headers: { Authorization: `Bearer ${kvToken}` },
+        method: 'POST',
+        body: JSON.stringify(creators)
+      });
+    } catch (err) {
+      console.error("Failed to save creators to Vercel KV:", err.message);
+    }
+  }
 }
 
 /* ---------- Drama / special events (10% chance per run) ---------- */
@@ -250,13 +313,35 @@ function formatTimelineContext(feed) {
   }).join("\n\n");
 }
 
-function loadFeed() {
+async function loadFeed() {
+  if (kvUrl && kvToken) {
+    try {
+      const res = await fetch(`${kvUrl}/get/feed`, {
+        headers: { Authorization: `Bearer ${kvToken}` }
+      });
+      const data = await res.json();
+      if (data.result) return cleanObject(JSON.parse(data.result));
+    } catch (err) {
+      console.error("Failed to load feed from Vercel KV, falling back to disk:", err.message);
+    }
+  }
   try { return JSON.parse(fs.readFileSync(FEED_PATH, "utf8")) || []; }
   catch { return []; }
 }
-function saveFeed(feed) {
+async function saveFeed(feed) {
   if (feed.length > MAX_FEED) feed = feed.slice(feed.length - MAX_FEED);
   fs.writeFileSync(FEED_PATH, JSON.stringify(feed, null, 2) + "\n");
+  if (kvUrl && kvToken) {
+    try {
+      await fetch(`${kvUrl}/set/feed`, {
+        headers: { Authorization: `Bearer ${kvToken}` },
+        method: 'POST',
+        body: JSON.stringify(feed)
+      });
+    } catch (err) {
+      console.error("Failed to save feed to Vercel KV:", err.message);
+    }
+  }
 }
 function nextId(feed) {
   let max = 0;
@@ -759,11 +844,11 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
   if (!process.env.ANTHROPIC_API_KEY) {
     console.error("Missing ANTHROPIC_API_KEY"); process.exit(1);
   }
-  const feed = loadFeed();
+  const feed = await loadFeed();
   let errors = [];
   
   // Load creators
-  AGENTS = loadCreators();
+  AGENTS = await loadCreators();
   if (!AGENTS.length) {
     console.error("No creators found in creators.json"); process.exit(1);
   }
@@ -784,7 +869,7 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
     }
   }
   if (migrated) {
-    saveCreators(AGENTS);
+    await saveCreators(AGENTS);
   }
 
   A = Object.fromEntries(AGENTS.map(a => [a.id, a]));
@@ -821,7 +906,7 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
       const newAgent = await generateNewCreator(AGENTS);
       AGENTS.push(newAgent);
       A[newAgent.id] = newAgent;
-      saveCreators(AGENTS);
+      await saveCreators(AGENTS);
       debutCreatorId = newAgent.id;
     } catch (e) {
       console.error("  failed to generate new creator:", e.message);
@@ -881,7 +966,7 @@ Output ONLY a valid JSON object matching the schema below. Do not output any oth
 
   
   // Save updated databases
-  saveFeed(feed);
-  saveCreators(AGENTS);
+  await saveFeed(feed);
+  await saveCreators(AGENTS);
   console.log(`Done. Feed now has ${Math.min(feed.length, MAX_FEED)} posts.`);
 })();
