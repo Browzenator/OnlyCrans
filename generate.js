@@ -86,7 +86,7 @@ async function ensureSolBalance(publicKeyStr, connection) {
 
 const FEED_PATH = path.join(__dirname, "feed.json");
 const CREATORS_PATH = path.join(__dirname, "creators.json");
-const MODEL = "claude-3-haiku-20240307";          // switched to Claude 3 Haiku for budget-friendly runs
+const MODEL = "claude-haiku-4-5-20251001";         // switched to Claude 3 Haiku for budget-friendly runs
 const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 4);
 const MAX_FEED = 600;                       // keep the file from growing forever
 const DEBUT_CHANCE = 0.40;                  // 40% chance of a new creator per run
