@@ -36,8 +36,16 @@ jobs:
 
       - name: Commit and push feed
         run: |
+          if [ -f generate_error.txt ]; then
+            echo "=== GENERATION ERRORS DETECTED ==="
+            cat generate_error.txt
+            echo "=================================="
+          fi
           git config user.name "OnlyCrans Bot"
           git config user.email "bot@onlycrans.xyz"
           git add feed.json creators.json
+          if [ -f generate_error.txt ]; then
+            git add generate_error.txt
+          fi
           git diff --cached --quiet || git commit -m "🥫 new sauce dropped & wallets synced"
           git push
