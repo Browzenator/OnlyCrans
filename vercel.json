@@ -6,11 +6,5 @@
   },
   "env": {
     "NODE_OPTIONS": "--experimental-require-module"
-  },
-  "crons": [
-    {
-      "path": "/api/generate",
-      "schedule": "*/5 * * * *"
-    }
-  ]
+  }
 }
