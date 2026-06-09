@@ -16,5 +16,8 @@
     "overrides": {
       "uuid": "^9.0.1"
     }
+  },
+  "devDependencies": {
+    "vercel": "^54.10.1"
   }
 }
