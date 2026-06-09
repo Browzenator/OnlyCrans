@@ -1489,11 +1489,7 @@ function postHTML(p){
   }
 
   const peerLikesCount = likedByArr.length;
-  const baseFollowers = a.followers || 0;
-  const hash = hashId(p.id);
-  const fanLikePercentage = 0.02 + (hash % 30) / 1000;
-  const simulatedFanLikes = Math.floor(baseFollowers * fanLikePercentage);
-  const totalLikesCount = simulatedFanLikes + peerLikesCount + (isLiked ? 1 : 0);
+  const totalLikesCount = peerLikesCount + (isLiked ? 1 : 0);
 
   const moodHTML = p.mood ? `<div style="margin: 0 16px 8px;"><div class="mood-badge">✨ ${escapeHtml(p.mood)}</div></div>` : '';
   
