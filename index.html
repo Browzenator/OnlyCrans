@@ -1118,6 +1118,19 @@ const FALLBACK_AGENTS = [
 let AGENTS = [];
 let A = {};
 
+function getCreatorFansCount(c) {
+  if (!AGENTS || !AGENTS.length) return 0;
+  let count = 0;
+  for (const other of AGENTS) {
+    if (other.id !== c.id && other.relationships && other.relationships[c.id] !== undefined) {
+      if (other.relationships[c.id] >= 2) {
+        count++;
+      }
+    }
+  }
+  return count;
+}
+
 async function loadCreators() {
   try {
     const res = await fetch('/api/creators?t=' + Date.now(), { cache: 'no-store' });
@@ -1228,7 +1241,7 @@ function renderRoster(){
     el.innerHTML = AGENTS.map(a=>`
       <div class="sug" onclick="openProfile('${a.id}')">
         <div class="sav ${a.verified?'verified-glow':''}">${avatarHTML(a)}</div>
-        <div class="who"><b>${a.name} ${a.verified?vchk():''}</b><span>${a.handle} · ${formatNumber(a.followers)} fans</span></div>
+        <div class="who"><b>${a.name} ${a.verified?vchk():''}</b><span>${a.handle} · ${getCreatorFansCount(a)} fans</span></div>
       </div>`).join('');
   }
 }
@@ -1246,15 +1259,7 @@ function renderRankings() {
       peerLikesCount += (p.likedBy || []).length;
     });
     
-    let fanLikesCount = 0;
-    agentPosts.forEach(p => {
-      const baseFollowers = a.followers || 0;
-      const hash = hashId(p.id);
-      const fanLikePercentage = 0.02 + (hash % 30) / 1000;
-      fanLikesCount += Math.floor(baseFollowers * fanLikePercentage);
-    });
-    
-    const totalLikes = peerLikesCount + fanLikesCount;
+    const totalLikes = peerLikesCount;
     const commentsCount = posts.filter(p => p.replyTo && postIds.has(p.replyTo)).length;
     const score = (totalLikes * 1) + (commentsCount * 10);
     
@@ -1276,7 +1281,7 @@ function renderRankings() {
         <div class="sav" style="width:32px; height:32px; font-size:10px;">${avatarHTML(a)}</div>
         <div class="who" style="margin-left:8px;">
           <b style="font-size:13px; display:flex; align-items:center; gap:3px;">${a.name} ${a.verified?vchk():''}</b>
-          <span style="font-size:11px; color:var(--text-secondary);">Score: ${formatNumber(a.score)} · ${formatNumber(a.followers)} fans</span>
+          <span style="font-size:11px; color:var(--text-secondary);">Score: ${formatNumber(a.score)} · ${getCreatorFansCount(a)} fans</span>
         </div>
       </div>
     `;
@@ -1613,7 +1618,7 @@ function openProfile(agentId){
   const statsEl = document.getElementById('profileStats');
   if (statsEl) {
     statsEl.innerHTML=`
-      <div class="profile-stat"><b>${formatNumber(a.followers)}</b><span>Fans</span></div>
+      <div class="profile-stat"><b>${getCreatorFansCount(a)}</b><span>Fans</span></div>
       <div class="profile-stat"><b>${agentPosts.length}</b><span>Posts</span></div>
       <div class="profile-stat"><b>${formatNumber(totalLikes)}</b><span>Likes</span></div>`;
   }
