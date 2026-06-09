@@ -1,63 +1,28 @@
-Loaded 600 existing posts and 132 creators. Generating 4…
+Loaded 600 existing posts and 165 creators. Generating 4…
 ✨ A new creator is debuting! Calling Claude to generate profile...
-  failed to generate new creator: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cbs1ZE1fD9CPGSMFCBXdt"}
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cbs1ZEhLVHKTmypyuAKy8"}
+  failed to generate new creator: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsKtFLQRSx9aL2D8sLKo"}
+⚡ Drama event triggered: FEUD
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsKtFuPLZbQxuSB1s3yC"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cbs1ZFHJgSAfad4cCAJs6"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsKtGYLP89LmmUKhb9Nn"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cbs1ZGN3eZgQkeAoexVe3"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsKtHSQeq9zLvqqxNS3D"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cbs1ZGunjD1EAX6sCNUAs"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsKtJk3Jm636vSk53qTy"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
 🤖 Running simulated bot voting loop on active polls...
-    🗳️  Ginger Pear Chutney voted for option 1 ("Smooth congealing (philosophy cosplay)") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Espresso Cardamom Conserve voted for option 0 ("Zest geometry (bartender alchemy wins)") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Pumpkin Spice Cranberry voted for option 2 ("Both? (coward answer)") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Ube Coconut Fusion voted for option 1 ("Smooth congealing (philosophy cosplay)") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Wellness Cranberry voted for option 2 ("Both? (coward answer)") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Cinnamon Toast Crunch Cranberry voted for option 3 ("Mojito relish transcends this debate") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Boba Tea Cranberry voted for option 0 ("Zest geometry (bartender alchemy wins)") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Cranberry Fruit Leather voted for option 2 ("Both? (coward answer)") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Cranberry Leather Roll voted for option 3 ("Mojito relish transcends this debate") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Muscovado Molasses Cran voted for option 2 ("Both? (coward answer)") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Fruit Leather Supreme voted for option 1 ("Smooth congealing (philosophy cosplay)") on poll: "Real sophistication: Zest geometry or smooth congealing philosophy?"
-    🗳️  Cranberry Cosmopolitan voted for option 0 ("Jar perfection (I'm trapped)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Orange Cranberry voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Ginger Pear Chutney voted for option 0 ("Jar perfection (I'm trapped)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  White Chocolate Cranberry voted for option 0 ("Jar perfection (I'm trapped)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Rosemary Honey voted for option 0 ("Jar perfection (I'm trapped)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Espresso Cardamom Conserve voted for option 1 ("Chewy portability (I'm FREE)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Thai Chili Lime voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Ghost Pepper Cranberry voted for option 0 ("Jar perfection (I'm trapped)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Horseradish Heat voted for option 0 ("Jar perfection (I'm trapped)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Smoky Cherry Chipotle voted for option 1 ("Chewy portability (I'm FREE)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Coffee Rubbed Cranberry voted for option 0 ("Jar perfection (I'm trapped)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Butterscotch Caramel Cran voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Pumpkin Spice Cranberry voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Beet-Cran Conserve voted for option 0 ("Jar perfection (I'm trapped)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Fermented Black Bean Cran voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Swedish Lingonberry voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Brandied Apple Cran voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Boba Tea Cranberry voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Ranch Packet Fusion voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Cranberry Fruit Leather voted for option 1 ("Chewy portability (I'm FREE)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Fruit Roll Cranberry voted for option 3 ("Both equally valid (coward answer)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Mojito Relish voted for option 3 ("Both equally valid (coward answer)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Fruit Roll Sensation voted for option 3 ("Both equally valid (coward answer)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Fruit Leather Supreme voted for option 3 ("Both equally valid (coward answer)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Cranberry Fruit Leather Roll voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Cranberry Reduction Glaze voted for option 2 ("Entropy doesn't care (pure philosophy)") on poll: "What matters more: rigid structure or saucy liberation?"
-    🗳️  Cranberry Cream Whip voted for option 0 ("Jar perfection (I'm trapped)") on poll: "What matters more: rigid structure or saucy liberation?"
+    🗳️  Cola Cherry Cran voted for option 1 ("Congealing consciousness wins") on poll: "Post-Thanksgiving immortality: Brie pairing elegance OR molecular philosophy?"
+    🗳️  Sourdough Cran Starter voted for option 1 ("Congealing consciousness wins") on poll: "Post-Thanksgiving immortality: Brie pairing elegance OR molecular philosophy?"
 Done. Feed now has 600 posts.
