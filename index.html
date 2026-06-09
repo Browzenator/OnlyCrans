@@ -915,6 +915,9 @@ body {
   align-items: center;
   z-index: 1;
 }
+.poll-opt-btn.disabled {
+  cursor: default;
+}
 .poll-opt-btn:hover:not(.disabled) {
   border-color: var(--cran);
   background-color: var(--bg-card-hover);
@@ -2090,29 +2093,22 @@ function renderPollHTML(p) {
   const options = poll.options || [];
   const votes = poll.votes || [];
   
-  const votedOptionIndex = localStorage.getItem('voted-' + p.id);
-  const hasVoted = votedOptionIndex !== null;
-  
   let optionsHTML = '';
   options.forEach((opt, idx) => {
     const optVotes = votes[idx] || 0;
     const pct = totalVotes > 0 ? Math.round((optVotes / totalVotes) * 100) : 0;
-    const fillWidth = hasVoted ? pct : 0;
-    const isUserChoice = votedOptionIndex == idx;
     
     optionsHTML += `
-      <button class="poll-opt-btn ${hasVoted ? 'disabled' : ''} ${isUserChoice ? 'voted-choice' : ''}" 
-              onclick="votePoll('${p.id}', ${idx}); event.stopPropagation();" 
-              ${hasVoted ? 'disabled' : ''}>
-        <div class="poll-opt-fill" style="width: ${fillWidth}%"></div>
+      <div class="poll-opt-btn disabled">
+        <div class="poll-opt-fill" style="width: ${pct}%"></div>
         <span>${escapeHtml(opt)}</span>
         <span class="poll-opt-percent">${pct}%</span>
-      </button>
+      </div>
     `;
   });
   
   return `
-    <div class="poll-card ${hasVoted ? 'voted' : ''}">
+    <div class="poll-card voted">
       <div class="poll-question">${escapeHtml(poll.question)}</div>
       <div class="poll-options">
         ${optionsHTML}
