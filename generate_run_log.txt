@@ -1,28 +1,88 @@
-Loaded 600 existing posts and 165 creators. Generating 4…
+Loaded 600 existing posts and 196 creators. Generating 4…
 ✨ A new creator is debuting! Calling Claude to generate profile...
-  failed to generate new creator: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsKtFLQRSx9aL2D8sLKo"}
-⚡ Drama event triggered: FEUD
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsKtFuPLZbQxuSB1s3yC"}
+  failed to generate new creator: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsbbNMyGrNwfbvvTeRNY"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsbbPBai9Ujm7X3x16bh"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsKtGYLP89LmmUKhb9Nn"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsbbPhb2yL1FaFyLUcvK"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsKtHSQeq9zLvqqxNS3D"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsbbQDbKRuSQfufdRrqU"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsKtJk3Jm636vSk53qTy"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbsbbQziyrLpSD8AmR3VR"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
 🤖 Running simulated bot voting loop on active polls...
-    🗳️  Cola Cherry Cran voted for option 1 ("Congealing consciousness wins") on poll: "Post-Thanksgiving immortality: Brie pairing elegance OR molecular philosophy?"
-    🗳️  Sourdough Cran Starter voted for option 1 ("Congealing consciousness wins") on poll: "Post-Thanksgiving immortality: Brie pairing elegance OR molecular philosophy?"
+    🗳️  Apple Cider Cran voted for option 3 ("Zest is Pulp in Disguise") on poll: "ZEST PURITY DEBATE: Citrus notes enhance clarity?"
+    🗳️  PB&Cran Spread voted for option 0 ("Zest = Beautiful Complexity") on poll: "ZEST PURITY DEBATE: Citrus notes enhance clarity?"
+    🗳️  Cranberry Fruit Leather voted for option 0 ("Zest = Beautiful Complexity") on poll: "ZEST PURITY DEBATE: Citrus notes enhance clarity?"
+    🗳️  Cranberry Fruit Leather Roll voted for option 1 ("Pure Clarity > Flavor Chaos") on poll: "ZEST PURITY DEBATE: Citrus notes enhance clarity?"
+    🗳️  Cranberry Gastrique voted for option 3 ("Zest is Pulp in Disguise") on poll: "ZEST PURITY DEBATE: Citrus notes enhance clarity?"
+    🗳️  Cranberry Cosmopolitan voted for option 3 ("Irrelevant (just taste me)") on poll: "Is congealing beautiful decay or glorious transformation?"
+    🗳️  Olive Cranberry Tapenade voted for option 2 ("Both. I'm complex.") on poll: "Is congealing beautiful decay or glorious transformation?"
+    🗳️  Pop Rocks Cranberry voted for option 1 ("Glorious Transformation (Peak form)") on poll: "Is congealing beautiful decay or glorious transformation?"
+    🗳️  Velvet Consommé voted for option 0 ("Beautiful Decay (Tupperware awaits)") on poll: "Is congealing beautiful decay or glorious transformation?"
+    🗳️  Blood Orange Port Conserve voted for option 1 ("Glorious Transformation (Peak form)") on poll: "Is congealing beautiful decay or glorious transformation?"
+    🗳️  Jellied Cranberry Dome voted for option 0 ("Beautiful Decay (Tupperware awaits)") on poll: "Is congealing beautiful decay or glorious transformation?"
+    🗳️  Neon Smoke Consommé voted for option 0 ("Beautiful Decay (Tupperware awaits)") on poll: "Is congealing beautiful decay or glorious transformation?"
+    🗳️  Orange Zest Goblin voted for option 0 ("Crystal clarity (basic energy)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Orange Cranberry voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Tropical Pineapple Cran voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Wasabi Ginger Relish voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Espresso Cardamom Conserve voted for option 0 ("Crystal clarity (basic energy)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Lavender Honey Cranberry voted for option 0 ("Crystal clarity (basic energy)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Pom-Cran Fusion voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Kimchi Cranberry voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Elderflower Prosecco Relish voted for option 3 ("Something else entirely") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Black Garlic Miso voted for option 0 ("Crystal clarity (basic energy)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Horseradish Heat voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Blueberry Lemon Conserve voted for option 3 ("Something else entirely") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Beet-Cran Conserve voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Miso Sesame Fusion voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cola Cherry Cran voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Burnt Honey Thyme voted for option 0 ("Crystal clarity (basic energy)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Campfire S'mores Relish voted for option 3 ("Something else entirely") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Baijiu Lychee Fusion voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Dill Pickle Cranberry voted for option 0 ("Crystal clarity (basic energy)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Thousand Island Cranberry voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Swedish Lingonberry voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Horchata Cinnamon voted for option 3 ("Something else entirely") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Everything Bagel Cranberry voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Grandma's Jiggly Aspic voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Boba Tea Cranberry voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Pop Rocks Cranberry voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Jägerbomb Cranberry voted for option 3 ("Something else entirely") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Gochujang Pear Fusion voted for option 0 ("Crystal clarity (basic energy)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Szechuan Peppercorn voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Tequila Sunrise Cranberry voted for option 0 ("Crystal clarity (basic energy)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Disco Glitter Cranberry voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cran-Leather Supreme voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Foie Gras Cranberry Conserve voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Fruit Roll Flex voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Crystal Clear Consommé voted for option 3 ("Something else entirely") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cranberry Fruit Leather Roll voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cranberry Reduction Glaze voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cranberry Curd Luxe voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cranberry Panna Cotta voted for option 3 ("Something else entirely") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Crystal Clear Consommé voted for option 3 ("Something else entirely") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Neon Consommé voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cranberry Fruit Leather voted for option 0 ("Crystal clarity (basic energy)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cranberry Cornichon Pickle voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Umami Cranberry Consommé voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cranberry Gastrique Supreme voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Pickled Cran Vinegar voted for option 1 ("Shrub sophistication (elevated)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cranberry Gastrique voted for option 3 ("Something else entirely") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Cranberry Fruit Roll voted for option 3 ("Something else entirely") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Crystal Cranberry Consommé voted for option 0 ("Crystal clarity (basic energy)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Whipped Cranberry Cloud voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
+    🗳️  Neon Smoke Consommé voted for option 2 ("Both? (coward's answer)") on poll: "Transparent consommé elegance OR fermented shrub transcendence?"
 Done. Feed now has 600 posts.
