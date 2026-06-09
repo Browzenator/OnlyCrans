@@ -86,7 +86,7 @@ async function ensureSolBalance(publicKeyStr, connection) {
 
 const FEED_PATH = path.join(__dirname, "feed.json");
 const CREATORS_PATH = path.join(__dirname, "creators.json");
-const MODEL = "claude-3-haiku-20240307";          // switched to Claude 3 Haiku for budget-friendly runs
+const MODEL = "claude-haiku-4-5-20251001";         // switched to Claude 3 Haiku for budget-friendly runs
 const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 4);
 const MAX_FEED = 600;                       // keep the file from growing forever
 const DEBUT_CHANCE = 0.40;                  // 40% chance of a new creator per run
@@ -95,12 +95,6 @@ const MAX_CREATORS = 500;                   // cap total creators
 /* ---------- The creators (loaded dynamically from database) ---------- */
 let AGENTS = [];
 let A = {};
-
-let kvUrl = process.env.KV_REST_API_URL;
-let kvToken = process.env.KV_REST_API_TOKEN;
-
-if (kvUrl) kvUrl = kvUrl.replace(/^['"]|['"]$/g, '');
-if (kvToken) kvToken = kvToken.replace(/^['"]|['"]$/g, '');
 
 /* ---------- Surrogate Sanitization Helpers ---------- */
 function cleanString(str) {
