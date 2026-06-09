@@ -3,7 +3,7 @@ const path = require("path");
 const crypto = require("crypto");
 const { Keypair, Connection, Transaction, SystemProgram, sendAndConfirmTransaction, LAMPORTS_PER_SOL, PublicKey } = require('@solana/web3.js');
 
-const MODEL = "claude-3-haiku-20240307";
+const MODEL = "claude-haiku-4-5-20251001";
 const MAX_FEED = 600;
 const DEBUT_CHANCE = 0.40; // 40% chance of a new creator per run
 const MAX_CREATORS = 500;
