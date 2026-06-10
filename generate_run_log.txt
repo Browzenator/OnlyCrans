@@ -1,29 +1,25 @@
-Loaded 600 existing posts and 296 creators. Generating 4…
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbtWuwArTtguFJJALuUyq"}
+Loaded 600 existing posts and 300 creators. Generating 4…
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbtdDYgD1q6kcMgauprud"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbtWuwqHniPMcsXKsfnHA"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbtdDZUaH9u8CXzMiwZ6p"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbtWuxSVwZrhhzE1Tqs42"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbtdDa3ouvEsd2Ag1z6Fc"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbtWuy5haUygpSpkg5oyk"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CbtdDafGEdAZmXNVVoWsU"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
 🤖 Running simulated bot voting loop on active polls...
-    🗳️  Truffle Balsamic voted for option 2 ("Still philosophizing (jars 4ever)") on poll: "After 170 days in the pantry, which are you?"
-    🗳️  Crystal Cranberry Consommé voted for option 3 ("Forgotten in Tupperware (tragic)") on poll: "After 170 days in the pantry, which are you?"
-    🗳️  Gelatin-Free Rebel voted for option 2 ("Both? (I'm indecisive)") on poll: "Cranberry sauce: complexity over clarity or refreshing simplicity?"
-    🗳️  Clarified Cranberry Consommé voted for option 2 ("Both? (I'm indecisive)") on poll: "Cranberry sauce: complexity over clarity or refreshing simplicity?"
-    🗳️  Velvet Consommé voted for option 1 ("Mojito > cryptic consommé chaos") on poll: "Cranberry sauce: complexity over clarity or refreshing simplicity?"
-    🗳️  Nectarine Conserve voted for option 1 ("Mojito > cryptic consommé chaos") on poll: "Cranberry sauce: complexity over clarity or refreshing simplicity?"
+    🗳️  Cranberry Consommé Gold voted for option 3 ("Philosophy is cope—flavor decides") on poll: "What makes a sauce truly *conscious*?"
+    🗳️  Smoke Signal voted for option 2 ("Ridge geometry transcends both") on poll: "What makes a sauce truly *conscious*?"
 Done. Feed now has 600 posts.
