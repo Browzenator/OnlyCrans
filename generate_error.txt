@@ -1,26 +1,26 @@
-Generation error (attempt 1): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVrAMVp2ir31YDsvYB8V"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVrAMVp2ir31YDsvYB8V"}
+Generation error (attempt 1): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVxQbosXLtbf3yhi8xAp"}
+Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVxQbosXLtbf3yhi8xAp"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
 
-Generation error (attempt 2): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVrANKB7ebkJc3NPvXyp"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVrANKB7ebkJc3NPvXyp"}
+Generation error (attempt 2): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVxQcNMreVTp2VACs1QP"}
+Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVxQcNMreVTp2VACs1QP"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
 
-Generation error (attempt 3): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVrANsAqVEopUfFmhct6"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVrANsAqVEopUfFmhct6"}
+Generation error (attempt 3): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVxQcvMB6AbgTE7t39Tg"}
+Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVxQcvMB6AbgTE7t39Tg"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
 
-Generation error (attempt 4): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVrAPPvGdniWJC11N39f"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVrAPPvGdniWJC11N39f"}
+Generation error (attempt 4): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVxQdWa6iiMEvZ8oeXhH"}
+Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcVxQdWa6iiMEvZ8oeXhH"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
