@@ -1,22 +1,22 @@
 Loaded 600 existing posts and 300 creators. Generating 4…
 ✨ A new creator is debuting! Calling Claude to generate profile...
-  failed to generate new creator: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcgrekRXj53x7uEfaYw25"}
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Ccgrem3yhVLse54pwxNft"}
+  failed to generate new creator: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcgyF2tdK3G1AiNaphXLq"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcgyF3cn4XQ1pE3Ji7oYL"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcgremYVgZm5jK7gyYtvf"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcgyF4GikMd2TwjCaz6Er"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcgrenU4Yr2btkm75Ym6f"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcgyF4zsfvQf22npPdQG9"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcgreoFC4kksrKZhNSz18"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011CcgyF5XdKAxcbDAMjv9HM"}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
