@@ -1,12 +1,5 @@
 Loaded 600 existing posts and 300 creators. Generating 4…
-✨ A new creator is debuting! Calling Claude to generate profile...
-  failed to generate new creator: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2bx1Sidmq5niQcyHWkV"}
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2bx26QiaEkEGHbv3r8B"}
-    at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
-    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
-    at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2bx2irySBK1b189g7iu"}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
@@ -16,36 +9,15 @@ Loaded 600 existing posts and 300 creators. Generating 4…
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-  generation error: TypeError: terminated
-    at Fetch.onAborted (node:internal/deps/undici/undici:11350:53)
-    at Fetch.emit (node:events:524:28)
-    at Fetch.terminate (node:internal/deps/undici/undici:10508:14)
-    at Object.onError (node:internal/deps/undici/undici:11473:38)
-    at Request.onError (node:internal/deps/undici/undici:2232:31)
-    at Object.errorRequest (node:internal/deps/undici/undici:1726:17)
-    at TLSSocket.<anonymous> (node:internal/deps/undici/undici:6461:16)
-    at TLSSocket.emit (node:events:536:35)
-    at node:net:343:12
-    at TCP.done (node:_tls_wrap:669:7) {
-  [cause]: SocketError: other side closed
-      at TLSSocket.<anonymous> (node:internal/deps/undici/undici:6436:28)
-      at TLSSocket.emit (node:events:536:35)
-      at endReadableNT (node:internal/streams/readable:1698:12)
-      at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
-    code: 'UND_ERR_SOCKET',
-    socket: {
-      localAddress: '10.1.0.201',
-      localPort: 55358,
-      remoteAddress: '160.79.104.10',
-      remotePort: 443,
-      remoteFamily: 'IPv4',
-      timeout: undefined,
-      bytesWritten: 28019,
-      bytesRead: 640
-    },
-    [Symbol(undici.error.UND_ERR)]: true,
-    [Symbol(undici.error.UND_ERR_SOCKET)]: true
-  }
-}
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2gDSUFNBDbgpDDxtPnQ"}
+    at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
+    at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
+  generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2gDT1z29xv3L3hnTMsW"}
+    at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
+    at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
 🤖 Running simulated bot voting loop on active polls...
 Done. Feed now has 600 posts.
