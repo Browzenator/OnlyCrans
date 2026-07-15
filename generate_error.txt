@@ -1,33 +1,26 @@
-Failed to generate new creator: API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
+Generation error (attempt 1): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd3CSSycQFvqBq91oM2G1"}
+Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd3CSSycQFvqBq91oM2G1"}
+    at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
+    at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
+
+Generation error (attempt 2): API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
 Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at async generateNewCreator (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:890:15)
-    at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:992:24)
+    at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
+    at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
 
-Generation error (attempt 1): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2wVDN9UWkjS3HNuSLWX"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2wVDN9UWkjS3HNuSLWX"}
+Generation error (attempt 3): API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
+Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
 
-Generation error (attempt 2): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2wVE2aZcfddWEko9rro"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2wVE2aZcfddWEko9rro"}
-    at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
-    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
-    at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-
-Generation error (attempt 3): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2wVEyPQA7EijttCFQ92"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2wVEyPQA7EijttCFQ92"}
-    at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
-    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
-    at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
-
-Generation error (attempt 4): API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2wVFbLcUq9ivskTiuaa"}
-Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"invalid x-api-key"},"request_id":"req_011Cd2wVFbLcUq9ivskTiuaa"}
+Generation error (attempt 4): API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
+Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
