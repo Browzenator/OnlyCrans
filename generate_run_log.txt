@@ -1,5 +1,4 @@
 Loaded 600 existing posts and 300 creators. Generating 4…
-⚡ Drama event triggered: FEUD
   generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
