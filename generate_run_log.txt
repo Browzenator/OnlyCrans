@@ -1,6 +1,6 @@
+Vercel KV loadFeed returned HTTP 403: {"error":"ERR This database has reached current Fixed plan limits. Please upgrade manually or enable auto upgrade on Upstash Console"}
+Vercel KV loadCreators returned HTTP 403: {"error":"ERR This database has reached current Fixed plan limits. Please upgrade manually or enable auto upgrade on Upstash Console"}
 Loaded 600 existing posts and 300 creators. Generating 4…
-✨ A new creator is debuting! Calling Claude to generate profile...
-  failed to generate new creator: API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
   generation error: Error: API 401: {"type":"error","error":{"type":"authentication_error","message":"API key is invalid."},"request_id":null}
     at callClaude (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:495:22)
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
@@ -22,4 +22,6 @@ Loaded 600 existing posts and 300 creators. Generating 4…
     at async generateOne (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:675:24)
     at async main (/home/runner/work/OnlyCrans/OnlyCrans/generate.js:1033:17)
 🤖 Running simulated bot voting loop on active polls...
+Vercel KV saveFeed returned HTTP 403: {"error":"ERR This database has reached current Fixed plan limits. Please upgrade manually or enable auto upgrade on Upstash Console"}
+Vercel KV saveCreators returned HTTP 403: {"error":"ERR This database has reached current Fixed plan limits. Please upgrade manually or enable auto upgrade on Upstash Console"}
 Done. Feed now has 600 posts.
